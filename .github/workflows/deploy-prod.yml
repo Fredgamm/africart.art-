@@ -1,13 +1,18 @@
 # Déploiement automatique vers la prod o2switch (arancia.o2switch.net) par FTPS.
 # Se lance à chaque push sur main (donc à chaque fusion d'une PR), ou à la main depuis l'onglet Actions.
-# N'envoie que les fichiers modifiés du dépôt : voxel-child, africart-accueil, africart-pwa.
-# Ne supprime rien sur le serveur qui ne vienne pas du dépôt.
+#
+# Règle : on n'écrase JAMAIS sans accord un fichier modifié sur le serveur.
+#   1. On télécharge la version actuelle du serveur (lecture seule).
+#   2. On compare serveur / dépôt / dernière version déployée (.github/scripts/verifier_ecrasement.py).
+#   3. Si un fichier a été modifié sur le serveur : arrêt, rien n'est envoyé, liste dans le résumé.
+#      Pour écraser quand même : Actions > « Déploiement prod » > Run workflow, ecraser = oui.
+# Rien n'est supprimé sur le serveur en dehors des fichiers venant du dépôt.
 #
 # Secrets à créer dans GitHub (Settings > Secrets and variables > Actions) :
-#   FTP_USERNAME     compte FTP (idéalement un compte dédié limité au site)
+#   FTP_USERNAME     compte FTP
 #   FTP_PASSWORD     mot de passe de ce compte
 #   FTP_WP_CONTENT   chemin du dossier wp-content vu par ce compte FTP, terminé par /
-#                    ex. /africart.art/wp-content/  ou  /public_html/wp-content/
+#                    pour africart.art : /runabac.art/wp-content/
 
 name: Déploiement prod
 
@@ -15,6 +20,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      ecraser:
+        description: "Écraser les fichiers modifiés sur le serveur ? (après avoir lu la liste des conflits)"
+        type: choice
+        options: [non, oui]
+        default: non
 
 concurrency:
   group: deploy-prod
@@ -23,13 +34,36 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      FTP_HOST: arancia.o2switch.net
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      FTP_WP_CONTENT: ${{ secrets.FTP_WP_CONTENT }}
     steps:
       - name: Récupérer le code
         uses: actions/checkout@v4
 
       - name: Vérifier la syntaxe PHP
+        run: find wp-content -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: Télécharger la version du serveur (lecture seule)
         run: |
-          find wp-content -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+          case "$FTP_WP_CONTENT" in */) ;; *) echo "::error::FTP_WP_CONTENT doit finir par /"; exit 1;; esac
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp > /dev/null
+          mkdir -p "$RUNNER_TEMP/serveur"
+          cmds="set ftp:ssl-force true; set ftp:ssl-protect-data true; set net:max-retries 2; set net:timeout 30; set cmd:fail-exit no;"
+          cmds="$cmds cd '$FTP_WP_CONTENT' || exit 1;"
+          cmds="$cmds get -O '$RUNNER_TEMP/serveur' .ftp-deploy-sync-state.json;"
+          for d in $(git ls-files wp-content | cut -d/ -f2-3 | sort -u); do
+            cmds="$cmds mirror --parallel=4 '$d' '$RUNNER_TEMP/serveur/$d';"
+          done
+          lftp -u "$FTP_USERNAME,$FTP_PASSWORD" -e "$cmds bye" "ftp://$FTP_HOST"
+
+      - name: Vérifier les fichiers modifiés sur le serveur
+        run: |
+          etat="$RUNNER_TEMP/serveur/.ftp-deploy-sync-state.json"
+          [ -f "$etat" ] || etat="-"
+          python3 .github/scripts/verifier_ecrasement.py wp-content "$RUNNER_TEMP/serveur" "$etat" "${{ inputs.ecraser || 'non' }}"
 
       - name: Envoyer sur o2switch (FTPS)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
