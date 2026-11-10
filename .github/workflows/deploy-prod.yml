@@ -58,6 +58,11 @@ jobs:
             cmds="$cmds mirror --parallel=4 '$d' '$RUNNER_TEMP/serveur/$d';"
           done
           lftp -u "$FTP_USERNAME,$FTP_PASSWORD" -e "$cmds bye" "ftp://$FTP_HOST"
+          # Garde-fou : on doit être dans le wp-content d'africart.art, pas dans un autre site du compte.
+          if [ ! -f "$RUNNER_TEMP/serveur/themes/voxel-child/style.css" ]; then
+            echo "::error::themes/voxel-child/style.css introuvable dans $FTP_WP_CONTENT : mauvais dossier ? Déploiement arrêté, rien n'a été envoyé."
+            exit 1
+          fi
 
       - name: Vérifier les fichiers modifiés sur le serveur
         run: |
