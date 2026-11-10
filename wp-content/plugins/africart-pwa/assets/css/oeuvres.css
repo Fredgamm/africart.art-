@@ -1,0 +1,3624 @@
+/* -------------------------------------------------------------------------
+ * Consultation des oeuvres hors connexion.
+ *
+ * Ces styles ne s'appliquent qu'a la grille reprise sans reseau : en
+ * ligne, c'est le theme qui rend, et rien ici ne doit l'atteindre. D'ou
+ * le prefixe sur chaque selecteur, et aucune regle sur les classes de
+ * Voxel.
+ * ---------------------------------------------------------------------- */
+
+.afk-oeuvres-avis {
+	margin: 0 0 18px;
+	padding: 11px 14px;
+	border-radius: 8px;
+	border: 1px solid rgba( 217, 186, 97, .75 );
+	background: #fbf5e4;
+	/* Couleur posee en dur plutot que par variable : --afk-theme peut
+	   valoir une teinte claire selon les reglages, et le bandeau
+	   deviendrait illisible sur son propre fond. */
+	color: #0f4d73;
+	font-size: 14px;
+	line-height: 1.45;
+}
+
+/* ⚠️ Des cartes larges, donc peu de colonnes.
+ *
+ * A 210 px, quatre colonnes tenaient dans la page et chaque carte etait
+ * trop etroite pour ses trois gestes : << Supprimer >> sortait du cadre.
+ * Une oeuvre se reconnait a sa photo ; mieux vaut trois vignettes
+ * lisibles que quatre timbres-poste. */
+.afk-oeuvres-grille {
+	display: grid;
+	grid-template-columns: repeat( auto-fill, minmax( min( 100%, 300px ), 1fr ) );
+	gap: 20px;
+}
+
+.afk-oeuvre {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid rgba( 15, 77, 115, .14 );
+	border-radius: 12px;
+	overflow: hidden;
+	background: #fff;
+	transition: box-shadow .15s ease, border-color .15s ease;
+}
+
+.afk-oeuvre:hover {
+	border-color: rgba( 15, 77, 115, .3 );
+	box-shadow: 0 4px 16px rgba( 15, 77, 115, .1 );
+}
+
+/* `flex` colle la rangee de gestes en bas : sans cela, deux cartes
+   voisines dont l'une a un titre sur deux lignes desalignent leurs
+   boutons. */
+.afk-oeuvre-lien {
+	flex: 1 1 auto;
+	display: block;
+	text-decoration: none;
+	color: inherit;
+}
+
+.afk-oeuvre-image {
+	display: block;
+	width: 100%;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+	background: rgba( 15, 77, 115, .07 );
+}
+
+/* ⚠️ Une oeuvre sans visuel garde la meme hauteur que les autres : une
+   grille dont les cases sautent est plus penible qu'une case vide.
+
+   Et elle porte un dessin. Un aplat gris se lit comme une image qui
+   n'a pas fini de charger — on l'attend. Un cadre avec une montagne dit
+   qu'il n'y a pas de photo, ce qui est un etat, pas un chargement. */
+.afk-oeuvre-image-vide {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	color: rgba( 15, 77, 115, .34 );
+	background: repeating-linear-gradient(
+		45deg,
+		rgba( 15, 77, 115, .045 ),
+		rgba( 15, 77, 115, .045 ) 9px,
+		rgba( 15, 77, 115, .085 ) 9px,
+		rgba( 15, 77, 115, .085 ) 18px
+	);
+}
+
+.afk-oeuvre-image-mot {
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+/* ------------------------------------------------------------------
+ * « Enregistrer une nouvelle oeuvre », en tete de grille
+ *
+ * ⚠️ De la taille d'une oeuvre, et dans la meme grille : un bouton pose
+ * au-dessus aurait ete un element de plus a sauter du regard. Une case
+ * de meme format se lit comme la place de la prochaine.
+ * ---------------------------------------------------------------- */
+.afk-oeuvre-neuve {
+	border-radius: 12px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	min-height: 200px;
+	padding: 18px;
+	border: 2px dashed rgba( 15, 77, 115, .3 );
+	background: transparent;
+	color: var( --e-global-color-primary, #0f4d73 );
+	text-align: center;
+	text-decoration: none;
+	transition: border-color .15s, background-color .15s;
+}
+
+/* ⚠️ `:focus-visible` a part, jamais groupe.
+
+   Un selecteur qu'un navigateur ne connait pas invalide la regle
+   ENTIERE, pas seulement sa ligne : sur Safari d'avant 15.4, la
+   moitie `:hover` tombait avec lui, et le champ actif perdait son
+   cadre en meme temps que son contour de mise au point. La regle
+   est donc coupee en deux partout ou les deux voisinaient. */
+.afk-oeuvre-neuve:hover {
+	border-color: var( --e-global-color-primary, #0f4d73 );
+	background: rgba( 15, 77, 115, .05 );
+}
+
+.afk-oeuvre-neuve:focus-visible {
+	border-color: var( --e-global-color-primary, #0f4d73 );
+	background: rgba( 15, 77, 115, .05 );
+}
+
+.afk-oeuvre-neuve-rond {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 58px;
+	height: 58px;
+	border-radius: 50%;
+	background: rgba( 15, 77, 115, .1 );
+}
+
+.afk-oeuvre-neuve-texte {
+	font-size: 15px;
+	font-weight: 700;
+	line-height: 1.3;
+}
+
+.afk-oeuvre-corps {
+	padding: 12px 14px 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	align-items: flex-start;
+}
+
+/* Les pastilles se rangent cote a cote tant qu'il y a la place : empilees,
+   elles faisaient trois lignes de hauteur pour dire deux mots. */
+.afk-oeuvre-pastilles {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.afk-oeuvre-titre {
+	margin: 0;
+	font-size: 15px;
+	line-height: 1.3;
+	font-weight: 600;
+	color: var( --e-global-color-primary, #0f4d73 );
+}
+
+.afk-oeuvre-etat {
+	font-size: 12px;
+	font-weight: 600;
+	padding: 2px 9px;
+	border-radius: 999px;
+	border: 1px solid currentColor;
+	white-space: nowrap;
+}
+
+/* Chaque etat porte sa couleur : << en validation >> ne doit pas se
+   confondre avec << en ligne >>, c'est toute la difference entre une
+   oeuvre visible du public et une oeuvre qui attend un regard. */
+.afk-etat-published   { color: #1f7a4d; }
+.afk-etat-review      { color: #a8720a; }
+.afk-etat-draft       { color: #5a7385; }
+.afk-etat-rejected    { color: #b3312c; }
+.afk-etat-unpublished { color: #5a7385; }
+
+/* ⚠️ Aucune regle prefers-color-scheme ici, deliberement.
+ *
+ * La carte s'affiche DANS la page du theme, qui est claire en toute
+ * circonstance. Suivre le theme du systeme d'exploitation posait une
+ * carte sombre sur un fond clair et un bandeau illisible — constate au
+ * banc d'essai. Ce qui fait autorite, c'est la page qui accueille,
+ * jamais le reglage de l'appareil.
+ */
+
+/* -------------------------------------------------------------------------
+ * Formulaire de depot.
+ *
+ * ⚠️ Tout est prefixe `afk-`, et rien ne cible une classe du theme. Ces
+ * regles vivent DANS la page de Voxel : une regle sur `input` ou sur
+ * `fieldset` atteindrait ses propres formulaires, et le module casserait
+ * un ecran qu'il n'a jamais touche.
+ *
+ * Les valeurs sont posees en variables sur `.afk-form` plutot qu'en dur :
+ * changer la teinte de marque ne doit pas demander de relire trente
+ * regles. Elles restent locales au formulaire — les poser sur `:root`
+ * exposerait le theme a nos noms.
+ * ---------------------------------------------------------------------- */
+
+.afk-form {
+	/* ⚠️ Les teintes viennent du site, pas de ce fichier.
+	 *
+	 * Elles etaient posees en dur — un orange et un marine inventes, qui
+	 * n'existaient nulle part dans la charte d'AFRICART. Le formulaire
+	 * ressemblait donc a une piece rapportee au milieu de ses propres
+	 * pages. Elementor expose ses couleurs globales en variables sur
+	 * chaque page : on s'y branche, et la valeur en dur ne sert plus que
+	 * de secours si le theme change de systeme.
+	 *
+	 * Consequence voulue : le jour ou le client change sa charte depuis
+	 * l'admin, le formulaire suit sans qu'on y touche.
+	 */
+	--afk-marque: var( --e-global-color-primary, #0f4d73 );
+	--afk-accent: var( --e-global-color-accent, #d9ba61 );
+	--afk-encre: var( --e-global-color-text, #0f4d73 );
+
+	--afk-doux: #5a7385;
+	--afk-trait: rgba( 15, 77, 115, .16 );
+	--afk-fond: #fff;
+
+	/* Aucun rouge dans la charte, et une erreur a besoin d'etre rouge :
+	   celui-ci reste a nous, choisi assez sombre pour tenir le contraste
+	   sur blanc comme sur son propre fond pale. */
+	--afk-alerte: #b3312c;
+
+	/* L'or de la charte ne peut pas porter du texte sur blanc — 1,9:1,
+	   trois fois moins que le minimum lisible. Il sert de fond ou de
+	   trait ; pour ecrire, on descend a cette version foncee. */
+	--afk-attente: #8a6a1b;
+
+	--afk-rayon: 12px;
+
+	/* Les polices du site, dans le meme esprit : le formulaire parle la
+	   langue de la page qui l'accueille. */
+	font-family: var( --e-global-typography-text-font-family, Roboto ), system-ui, -apple-system, sans-serif;
+
+	box-sizing: border-box;
+	max-width: 100%;
+	color: var( --afk-encre );
+
+	/* ⚠️ Colonne d'au moins un ecran, et la barre poussee vers le bas.
+	 *
+	 * << coller en bas >> ne colle a rien quand le contenu est plus court
+	 * que la fenetre : l'etape << Admin >> tient en deux champs, et la
+	 * barre d'action se retrouvait au milieu de l'ecran avec du vide en
+	 * dessous. Elle avait l'air posee au hasard, et le geste principal du
+	 * formulaire flottait.
+	 *
+	 * Le decalage est mesure par le script : la hauteur disponible depend
+	 * de l'en-tete du site, que cette feuille ne connait pas. La valeur
+	 * de repli couvre un en-tete ordinaire.
+	 */
+	display: flex;
+	flex-direction: column;
+	min-height: calc( 100vh - var( --afk-decalage, 220px ) );
+
+	/* `svh` tient compte des barres du navigateur mobile, qui se
+	   retractent au defilement : avec `vh`, la barre d'action tombait
+	   sous le pli sur iPhone. Pose apres coup pour que les navigateurs
+	   qui l'ignorent gardent la regle precedente. */
+	min-height: calc( 100svh - var( --afk-decalage, 220px ) );
+
+	/* ⚠️ Aucune reserve sous la barre. Elle s'ajoutait a la hauteur
+	   minimale et poussait la barre de vingt-quatre pixels sous le pli,
+	   faisant defiler une page qui tenait pourtant a l'ecran — mesure au
+	   banc. La barre porte son propre remplissage ; il suffit. */
+	padding-bottom: 0;
+}
+
+.afk-form *,
+.afk-form *::before,
+.afk-form *::after { box-sizing: border-box; }
+
+/* ⚠️ Sur grand ecran, le formulaire sort de sa colonne.
+ *
+ * Trente-six champs repartis sur deux colonnes dans une colonne de page
+ * de huit cents pixels, cela fait des colonnes de trois cent trente : la
+ * moitie des libelles du site y passent a la ligne, et un libelle sur
+ * deux lignes se lit comme deux questions. Le formulaire se recentre
+ * donc sur la fenetre plutot que sur son conteneur.
+ *
+ * Reserve aux grands ecrans : en dessous, la colonne occupe deja toute
+ * la largeur et cette regle ne ferait que deplacer le probleme. Elle ne
+ * vise que NOTRE ancrage — le conteneur du theme garde sa mise en page.
+ */
+@media ( min-width: 1024px ) {
+	.afk-oeuvre-form {
+		position: relative;
+		left: 50%;
+		width: min( 1180px, calc( 100vw - 48px ) );
+		max-width: none;
+		margin-inline: 0;
+		transform: translateX( -50% );
+	}
+}
+
+/* ── Rang et progression ───────────────────────────────────────────── */
+
+/* ⚠️ `top: 0` collait le bandeau DERRIERE l'en-tete du site, qui est
+   fixe : il montait, passait dessous, et ne se voyait plus. La hauteur
+   de cet en-tete est mesuree par le script — une feuille de style ne
+   peut pas la connaitre. La valeur de repli vaut zero : sans mesure, le
+   comportement d'avant. */
+.afk-form-tete {
+	position: sticky;
+	top: var( --afk-tete-haut, 0px );
+	z-index: 20;
+	margin: 0 0 18px;
+	padding: 12px 0 10px;
+	background: var( --afk-fond, #fff );
+}
+
+/* Le repere qui dit si le bandeau est colle ou au repos. Sans hauteur :
+   il ne doit rien ajouter a la mise en page. */
+.afk-form-sentinelle {
+	height: 0;
+	margin: 0;
+	padding: 0;
+	pointer-events: none;
+}
+
+/* ⚠️ Une ombre seulement quand il est colle.
+   Posee en permanence, elle soulignerait un titre au repos comme s'il
+   etait separe du formulaire. Elle ne sert qu'a une chose : dire que le
+   texte passe DESSOUS, sans quoi les champs semblent disparaitre. */
+.afk-form-tete-collee {
+	box-shadow: 0 6px 12px -8px rgba( 15, 77, 115, .35 );
+}
+
+/* Le remplissage lateral suit l'ombre : au repos le bandeau est dans le
+   flux du formulaire, colle il doit couvrir toute sa largeur. */
+.afk-form-tete-collee { padding-left: 2px; padding-right: 2px; }
+
+.afk-form-tete[hidden] { display: none; }
+
+/* Le rang a gauche, la sortie a droite : elle doit se voir sans disputer
+   la place au reste. */
+.afk-form-tete-rangee {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px 14px;
+	margin-bottom: 8px;
+}
+
+/* ⚠️ Discrete, mais toujours a l'ecran : la tete du formulaire est
+   collante. Pour quitter, il fallait traverser les quatre etapes. */
+.afk-form-sortie {
+	flex: 0 0 auto;
+	padding: 7px 13px;
+	border: 1px solid var( --afk-trait, rgba( 15, 77, 115, .16 ) );
+	border-radius: 999px;
+	background: var( --afk-fond, #fff );
+	color: var( --afk-marque, #0f4d73 );
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.afk-form-sortie:hover { border-color: var( --afk-marque, #0f4d73 ); }
+.afk-form-sortie[hidden] { display: none; }
+
+/* Les deux sorties vont ensemble, a droite du rang. */
+.afk-form-tete-gestes {
+	display: flex;
+	flex: 0 0 auto;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+/* ⚠️ Sans cadre ni couleur d'accent : abandonner une saisie n'est pas
+   une action qu'on propose, c'est une issue qu'on laisse ouverte. Elle
+   ne prend son ton d'alerte qu'au moment ou l'on va vers elle. */
+.afk-form-annuler {
+	flex: 0 0 auto;
+	padding: 7px 4px;
+	border: 0;
+	background: none;
+	color: #5a7385;
+	cursor: pointer;
+	font: inherit;
+	font-size: 13px;
+	white-space: nowrap;
+}
+
+.afk-form-annuler:hover { color: #b3312c; text-decoration: underline; }
+
+.afk-form-annuler:focus-visible { color: #b3312c; text-decoration: underline; }
+.afk-form-annuler[hidden] { display: none; }
+
+.afk-form-rang {
+	margin: 0;
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: .02em;
+	color: var( --afk-doux );
+}
+
+.afk-form-jauge {
+	height: 4px;
+	border-radius: 999px;
+	background: rgba( 15, 77, 115, .1 );
+	overflow: hidden;
+}
+
+.afk-form-jauge span {
+	display: block;
+	height: 100%;
+	width: 0;
+	border-radius: 999px;
+	background: var( --afk-marque );
+	transition: width .25s ease;
+}
+
+/* ── L'ecran d'une etape ───────────────────────────────────────────── */
+
+.afk-form-etape {
+	min-width: 0;
+	max-width: 100%;
+	margin: 0 0 20px;
+	padding: 20px;
+	border: 1px solid var( --afk-trait );
+	border-radius: var( --afk-rayon );
+	background: var( --afk-fond );
+	box-shadow: 0 1px 2px rgba( 15, 77, 115, .05 );
+}
+
+/* ⚠️ `display: none` et non l'attribut `hidden` : le collecteur de
+   valeurs ecarte les champs marques `hidden`, et une etape repliee
+   perdrait tout ce qui y a ete saisi au moment du depot. */
+.afk-etape-masquee { display: none; }
+
+/* ⚠️ Flottant, et non `float: none`. Une legende de fieldset interrompt
+   la bordure sur SA PREMIERE LIGNE seulement : un titre d'etape sur deux
+   lignes laissait le trait passer au travers du second mot. Le flottant
+   la sort de ce traitement et la rend au flux normal. */
+.afk-form-titre {
+	font-family: var( --e-global-typography-primary-font-family, BrutGrotesque ), Georgia, serif;
+	float: left;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	padding-bottom: 18px;
+	font-size: 20px;
+	line-height: 1.3;
+	font-weight: 700;
+	letter-spacing: -.01em;
+	color: var( --afk-encre );
+}
+
+/* ⚠️ L'ecart qui separe le titre de section du premier champ compte
+   double : trop court, le titre se lit comme l'etiquette de ce champ-la
+   et non comme celui de l'ecran. Deux captures de suite l'ont montre
+   trop serre — d'ou un filet, qui tranche la question au lieu de la
+   confier a quelques pixels. */
+.afk-form-champs {
+	clear: both;
+	display: grid;
+	grid-template-columns: 1fr;
+
+	/* L'ecart vertical loge le message d'erreur, qui est pose par-dessus
+	   plutot que dans le flux. Le reduire ferait mordre une erreur sur la
+	   rangee suivante. */
+	gap: 30px 20px;
+	margin-top: 0;
+	padding-top: 22px;
+	border-top: 1px solid var( --afk-trait );
+}
+
+@media ( min-width: 700px ) {
+	.afk-form-champs { grid-template-columns: 1fr 1fr; }
+	.afk-champ { grid-column: 1 / -1; }
+	.afk-champ-court { grid-column: auto; }
+}
+
+/* ── Un champ ──────────────────────────────────────────────────────── */
+
+/* ⚠️ Colonne, et la saisie poussee vers le bas.
+   Sur deux colonnes, un champ portant une ligne d'aide decale sa saisie
+   d'une trentaine de pixels par rapport a son voisin qui n'en a pas :
+   l'oeil lit alors deux escaliers au lieu d'une grille, et le formulaire
+   parait bricole. Le repoussoir aligne les saisies sur leur bas. */
+.afk-champ {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	margin: 0;
+}
+
+.afk-champ[hidden] { display: none; }
+
+.afk-champ-saisie,
+.afk-fichiers,
+.afk-champ-differe,
+.afk-champ-inconnu { margin-top: auto; }
+
+.afk-champ-label {
+	display: block;
+	margin: 0 0 4px;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.35;
+	color: var( --afk-encre );
+}
+
+.afk-champ-requis {
+	margin-left: 3px;
+	color: var( --afk-marque );
+}
+
+.afk-champ-aide {
+	margin: 0 0 7px;
+	font-size: 13px;
+	line-height: 1.45;
+	color: var( --afk-doux );
+}
+
+.afk-champ-saisie {
+	width: 100%;
+	min-height: 46px;
+	padding: 11px 13px;
+	border: 1px solid var( --afk-trait );
+	border-radius: 10px;
+	background: var( --afk-fond );
+	color: var( --afk-encre );
+	font: inherit;
+
+	/* ⚠️ 16 px au minimum. En dessous, iOS zoome des qu'un champ est
+	   touche et ne dezoome jamais : le formulaire devient inutilisable
+	   au doigt, ce qui est precisement l'usage vise. */
+	font-size: 16px;
+	line-height: 1.4;
+	transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.afk-champ-saisie::placeholder { color: rgba( 90, 115, 133, .8 ); }
+
+.afk-champ-saisie:hover { border-color: rgba( 15, 77, 115, .34 ); }
+
+.afk-champ-saisie:focus {
+	outline: none;
+	border-color: var( --afk-marque );
+	box-shadow: 0 0 0 3px rgba( 15, 77, 115, .18 );
+}
+
+.afk-champ-saisie:focus-visible {
+	outline: none;
+	border-color: var( --afk-marque );
+	box-shadow: 0 0 0 3px rgba( 15, 77, 115, .18 );
+}
+
+textarea.afk-champ-saisie {
+	min-height: 120px;
+	resize: vertical;
+}
+
+select.afk-champ-saisie {
+	appearance: none;
+	padding-right: 38px;
+	background-image: linear-gradient( 45deg, transparent 50%, #5a7385 50% ), linear-gradient( 135deg, #5a7385 50%, transparent 50% );
+	background-position: calc( 100% - 19px ) 52%, calc( 100% - 14px ) 52%;
+	background-size: 5px 5px, 5px 5px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+
+.afk-champ-compteur {
+	margin-top: 5px;
+	font-size: 12px;
+	text-align: right;
+	color: var( --afk-doux );
+}
+
+.afk-champ-compteur-limite {
+	color: var( --afk-attente );
+	font-weight: 600;
+}
+
+/* Une erreur se voit sans etre lue : la bordure d'abord, la phrase
+   ensuite. Sans la couleur, il faut relire tout l'ecran pour trouver
+   lequel des douze champs pose probleme.
+ *
+ * ⚠️ Posee hors du flux, dans l'ecart qui separe deux rangees. Dans le
+ * flux, elle allongeait son champ ; les saisies etant alignees par le
+ * bas, la voisine de la meme rangee remontait de vingt pixels — au
+ * moment precis ou l'artiste corrige, l'ecran bougeait sous ses yeux.
+ * Constate a la capture du banc. */
+.afk-champ-erreur {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	margin: 4px 0 0;
+	font-size: 13px;
+	line-height: 1.35;
+	font-weight: 600;
+	color: var( --afk-alerte );
+}
+
+.afk-champ-erreur[hidden] { display: none; }
+
+.afk-champ-fautif .afk-champ-saisie {
+	border-color: var( --afk-alerte );
+	background: #fffafa;
+}
+
+.afk-champ-fautif .afk-champ-saisie:focus {
+	box-shadow: 0 0 0 3px rgba( 179, 49, 44, .16 );
+}
+
+/* Un champ que le hors-connexion ne traite pas est montre et explique,
+   jamais omis : l'omettre laisserait croire qu'il n'existe pas. */
+.afk-champ-differe {
+	margin: 0;
+	padding: 12px 14px;
+	border: 1px dashed rgba( 15, 77, 115, .28 );
+	border-radius: 10px;
+	background: rgba( 15, 77, 115, .04 );
+	font-size: 13px;
+	line-height: 1.45;
+	color: var( --afk-doux );
+}
+
+/* Un type de champ que le formulaire ne sait pas rendre : dit, jamais
+   approxime. Le rendre en champ texte ferait ecrire des valeurs de
+   travers, sans erreur. */
+.afk-champ-inconnu {
+	margin: 0;
+	padding: 12px 14px;
+	border: 1px dashed var( --afk-alerte );
+	border-radius: 10px;
+	background: #fbeceb;
+	font-size: 13px;
+	line-height: 1.45;
+	color: var( --afk-alerte );
+}
+
+/* ── Visuels ───────────────────────────────────────────────────────── */
+
+.afk-fichiers { display: block; }
+
+.afk-fichiers-grille {
+	display: grid;
+	grid-template-columns: repeat( auto-fill, minmax( 104px, 1fr ) );
+	gap: 10px;
+}
+
+/* ⚠️ Le champ natif est retire de l'affichage sans etre retire du
+   document : `display: none` le rendrait injoignable au clavier et son
+   etiquette cesserait de l'ouvrir. */
+.afk-fichiers-choix {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect( 0 0 0 0 );
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Tant qu'aucune photo n'est posee, la zone s'etale : c'est la seule
+   consigne de l'ecran, et la tasser sur cent pixels rendait sa phrase
+   illisible sur quatre lignes. Des qu'une photo arrive, elle cede la
+   place et redevient une case parmi les autres. */
+.afk-fichiers-ajout {
+	display: flex;
+	grid-column: span 2;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 4px 8px;
+	min-height: 104px;
+	padding: 12px;
+	border: 2px dashed rgba( 15, 77, 115, .26 );
+	border-radius: 10px;
+	background: rgba( 15, 77, 115, .03 );
+	color: var( --afk-doux );
+	font-size: 12px;
+	line-height: 1.3;
+	text-align: center;
+	cursor: pointer;
+	transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+
+.afk-fichiers-ajout:hover {
+	border-color: var( --afk-marque );
+	background: rgba( 15, 77, 115, .05 );
+	color: var( --afk-marque );
+}
+
+.afk-fichiers-choix:focus-visible + .afk-fichiers-ajout {
+	border-color: var( --afk-marque );
+	background: rgba( 15, 77, 115, .05 );
+	color: var( --afk-marque );
+}
+
+.afk-fichiers-plus {
+	font-size: 24px;
+	line-height: 1;
+	font-weight: 300;
+}
+
+.afk-fichiers-invite { font-weight: 600; }
+
+/* Une fois des photos posees, la consigne de depot cede la place aux
+   visuels : c'est eux qu'on vient regarder. */
+.afk-fichiers-ajout-compact {
+	grid-column: span 1;
+	flex-direction: column;
+	gap: 2px;
+	padding: 10px;
+}
+
+.afk-fichiers-ajout-compact .afk-fichiers-glisser { display: none; }
+
+.afk-fichiers-survol .afk-fichiers-ajout {
+	border-color: var( --afk-marque );
+	background: rgba( 15, 77, 115, .07 );
+	color: var( --afk-marque );
+}
+
+.afk-fichier {
+	position: relative;
+	margin: 0;
+	aspect-ratio: 1 / 1;
+	border-radius: 10px;
+	overflow: hidden;
+	background: rgba( 15, 77, 115, .07 );
+}
+
+.afk-fichier-image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.afk-fichier-sansimage {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	padding: 8px;
+	font-size: 12px;
+	text-align: center;
+	color: var( --afk-doux );
+}
+
+/* Une photo gardee sur l'appareil se distingue d'une photo deposee :
+   l'artiste doit savoir laquelle n'est pas encore partie. */
+.afk-fichier-badge {
+	position: absolute;
+	left: 6px;
+	bottom: 6px;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background: var( --afk-accent );
+	color: var( --afk-encre );
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: .01em;
+}
+
+.afk-fichier-retirer {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	width: 26px;
+	height: 26px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: rgba( 15, 77, 115, .78 );
+	color: #fff;
+	font-size: 17px;
+	line-height: 26px;
+	cursor: pointer;
+}
+
+.afk-fichier-retirer:hover { background: var( --afk-alerte ); }
+
+.afk-fichiers-etat {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 8px 0 0;
+	font-size: 13px;
+	color: var( --afk-doux );
+}
+
+/* ⚠️ Une rondelle qui tourne pendant l'envoi.
+
+   « Envoi de photo.png… (1/2) » ne bougeait pas d'un pixel pendant les
+   dix secondes d'un transfert sur reseau mobile : rien ne distinguait
+   un envoi en cours d'un ecran fige, et l'artiste touchait le bouton
+   une seconde fois. C'est la rondelle du module — celle des cartes, de
+   la fiche et du message flottant — et non une seconde : deux dessins
+   d'attente differents se liraient comme deux attentes de natures
+   differentes. */
+.afk-fichiers-encours {
+	color: var( --afk-marque, #0f4d73 );
+	font-weight: 600;
+}
+
+/* Le texte ne se colle pas a la rondelle quand il passe a la ligne. */
+.afk-fichiers-etat .afk-rondelle { flex: 0 0 auto; }
+
+.afk-fichiers-echec { color: var( --afk-alerte ); font-weight: 600; }
+
+/* ── Barre d'action ────────────────────────────────────────────────── */
+
+.afk-form-barre {
+	position: sticky;
+	bottom: 0;
+	z-index: 4;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+
+	/* Pousse la barre au bas de la colonne quand l'etape est courte. */
+	margin-top: auto;
+	padding: 12px 0;
+	border-top: 1px solid var( --afk-trait );
+	background: var( --afk-fond );
+}
+
+.afk-form-rangee {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.afk-form-etat {
+	flex: 1 1 140px;
+	min-width: 0;
+	font-size: 13px;
+	line-height: 1.35;
+	color: var( --afk-doux );
+}
+
+/* ⚠️ Un refus doit se voir depuis le bouton qu'on vient de presser.
+   En simple texte rouge il passait inapercu, et l'artiste concluait que
+   le bouton ne marchait pas. */
+.afk-form-etat-alerte {
+	align-self: center;
+	padding: 7px 12px;
+	border: 1px solid rgba( 179, 49, 44, .35 );
+	border-radius: 8px;
+	background: #fbeceb;
+	color: var( --afk-alerte );
+	font-weight: 700;
+}
+
+.afk-form-actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.afk-form-bouton {
+	min-height: 46px;
+	padding: 12px 22px;
+	border-radius: 10px;
+	border: 1px solid transparent;
+	font: inherit;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background .15s ease, border-color .15s ease;
+}
+
+.afk-form-bouton[hidden] { display: none; }
+
+/* ⚠️ Chaque jeton porte sa valeur de secours.
+ *
+ * Ces boutons servent aussi dans les fenetres — arbitrage d'un conflit,
+ * confirmation de suppression — qui ne sont pas dans `.afk-form` et ou
+ * `--afk-marque` n'existe donc pas. Sans repli, la declaration tombait :
+ * fond transparent, texte blanc, bouton **invisible**. Constate a la
+ * capture du banc, sur << Envoyer ma version >>. */
+.afk-form-primaire {
+	background: var( --afk-marque, var( --e-global-color-primary, #0f4d73 ) );
+	color: #fff;
+}
+
+.afk-form-primaire:hover { background: #0b3a57; }
+
+.afk-form-secondaire {
+	background: transparent;
+	border-color: var( --afk-trait, rgba( 15, 77, 115, .18 ) );
+	color: var( --afk-encre, var( --e-global-color-text, #0f4d73 ) );
+}
+
+.afk-form-secondaire:hover { border-color: var( --afk-doux ); }
+
+.afk-form-bouton:focus-visible {
+	outline: 2px solid var( --afk-marque, var( --e-global-color-primary, #0f4d73 ) );
+	outline-offset: 2px;
+}
+
+.afk-form-bouton[disabled] {
+	background: #a8b6c0;
+	border-color: transparent;
+	color: #fff;
+	cursor: default;
+}
+
+
+/* Seconde pastille : l'etat d'envoi depuis cet appareil. Volontairement
+   distincte de l'etat de publication — une oeuvre peut etre en ligne et
+   porter une modification qui n'est pas encore partie. */
+.afk-oeuvre-envoi {
+	font-size: 12px;
+	font-weight: 600;
+	padding: 2px 9px;
+	border-radius: 999px;
+	white-space: nowrap;
+	background: #fbf2df;
+	border: 1px solid #a8720a;
+	color: #a8720a;
+}
+
+/* << A completer >> n'est pas une erreur du site : c'est une saisie qui
+   attend l'artiste, pas le reseau. Elle porte donc le ton de l'attente,
+   pas celui de l'alerte. */
+.afk-envoi-incomplet {
+	background: rgba( 15, 77, 115, .06 );
+	border-color: rgba( 15, 77, 115, .35 );
+	color: #0f4d73;
+}
+
+.afk-envoi-conflict { background: #fbeceb; border-color: #b3312c; color: #b3312c; }
+.afk-envoi-error    { background: #fbeceb; border-color: #b3312c; color: #b3312c; }
+
+/* Dans Elementor, le formulaire est rendu pour de vrai. Le ruban dit ce
+   qu'il ne fait pas — sans quoi l'auteur croirait avoir casse quelque
+   chose en voyant sa saisie d'essai ne rien declencher. */
+.afk-form-ruban {
+	margin: 0 0 16px;
+	padding: 9px 13px;
+	border: 1px dashed rgba( 15, 77, 115, .35 );
+	border-radius: 10px;
+	background: #f3f6f8;
+	color: #47606f;
+	font-size: 13px;
+	line-height: 1.4;
+}
+
+/* ⚠️ Aucune regle prefers-color-scheme, ici non plus. Le formulaire
+   s'affiche DANS la page du theme, claire en toute circonstance : suivre
+   le reglage du systeme poserait des champs sombres sur un fond clair.
+   Ce qui fait autorite, c'est la page qui accueille. */
+
+@media ( prefers-reduced-motion: reduce ) {
+	.afk-form *,
+	.afk-form-jauge span { transition: none !important; }
+}
+
+/* -------------------------------------------------------------------------
+ * L'etat du depot.
+ *
+ * Un seul bandeau, quel que soit l'ecran, et une seule question a
+ * laquelle il repond : est-ce que ce que je viens de faire est en
+ * securite ? La couleur porte la reponse avant que la phrase soit lue —
+ * mais elle ne la porte jamais SEULE : un daltonien lit le meme texte,
+ * et la puce n'est qu'un rappel.
+ * ---------------------------------------------------------------------- */
+
+.afk-etat {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	padding: 10px 12px;
+	border: 1px solid rgba( 15, 77, 115, .16 );
+	border-radius: 10px;
+	background: #f3f6f8;
+	color: #0f4d73;
+	font-size: 13px;
+	line-height: 1.4;
+}
+
+/* Un bandeau vide n'occupe pas la place : au chargement, le module n'a
+   pas encore tranche, et une case grise sans texte inquiete pour rien. */
+.afk-etat:empty {
+	display: none;
+}
+
+.afk-etat-puce {
+	flex: 0 0 auto;
+	width: 9px;
+	height: 9px;
+	margin-top: 5px;
+	border-radius: 50%;
+	background: currentColor;
+}
+
+.afk-etat-texte {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+/* L'etiquette de la saisie, a cote de l'etat du reseau et jamais a sa
+   place : << Brouillon >> + << Hors connexion >> est une situation
+   ordinaire, et les deux moities de la reponse doivent se lire d'un
+   seul coup d'oeil. */
+.afk-etat-phase {
+	flex: 0 0 auto;
+	align-self: center;
+	padding: 3px 10px;
+	border: 1px solid currentColor;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: .02em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.afk-phase-calme   { color: #47606f; }
+.afk-phase-attente { color: #8a6a1b; background: #fbf5e4; }
+.afk-phase-bon     { color: #1f7a4d; background: #f0f8f3; }
+.afk-phase-grave   { color: #b3312c; background: #fbeceb; }
+
+.afk-etat-titre {
+	display: block;
+	font-weight: 700;
+}
+
+.afk-etat-detail {
+	display: block;
+	color: #4a5260;
+}
+
+.afk-etat-action {
+	flex: 0 0 auto;
+	align-self: center;
+	padding: 6px 12px;
+	border: 1px solid currentColor;
+	border-radius: 999px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-size: 12px;
+	font-weight: 700;
+	text-decoration: none;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.afk-etat-action:hover { background: rgba( 255, 255, 255, .55 ); }
+
+/* Chaque ton porte sa couleur : « tout est envoye » ne doit pas se
+   confondre avec « envoi refuse », c'est toute la difference entre une
+   oeuvre en securite et une oeuvre perdue. */
+.afk-etat-bon {
+	border-color: rgba( 31, 122, 77, .35 );
+	background: #f0f8f3;
+	color: #1f7a4d;
+}
+
+.afk-etat-attente {
+	border-color: rgba( 217, 186, 97, .75 );
+	background: #fbf5e4;
+	color: #8a6a1b;
+}
+
+.afk-etat-grave {
+	border-color: rgba( 179, 49, 44, .4 );
+	background: #fbeceb;
+	color: #b3312c;
+}
+
+.afk-etat-marche {
+	border-color: rgba( 15, 77, 115, .4 );
+	background: rgba( 15, 77, 115, .06 );
+	color: #0f4d73;
+}
+
+.afk-etat-calme {
+	border-color: rgba( 15, 77, 115, .18 );
+	background: #f1f4f6;
+	color: #47606f;
+}
+
+/* Au repos, la bande n'est plus une bande : une ligne grise, sans cadre
+   ni pastille, qui porte l'heure du dernier enregistrement. Un encadre
+   vert << En ligne >> occupait la place d'un signal pour annoncer qu'il
+   n'y en avait aucun. */
+.afk-etat-muet {
+	padding: 2px 0;
+	border-color: transparent;
+	background: transparent;
+
+	/* ⚠️ La couleur du texte, pas le gris efface. Au repos, la seule
+	   chose que l'artiste cherche est << est-ce enregistre ? >> : la
+	   reponse ne doit pas se confondre avec le decor du pied de page. */
+	color: var( --afk-encre, #0f4d73 );
+}
+
+.afk-etat-muet .afk-etat-titre { font-weight: 600; }
+
+/* Une coche plutot qu'une pastille : elle confirme sans alerter. */
+.afk-etat-marque {
+	width: auto;
+	height: auto;
+	margin-top: 0;
+	border-radius: 0;
+	background: transparent;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.4;
+	color: #1f7a4d;
+}
+
+.afk-etat-muet .afk-etat-detail,
+.afk-etat-bon .afk-etat-detail,
+.afk-etat-attente .afk-etat-detail,
+.afk-etat-grave .afk-etat-detail,
+.afk-etat-marche .afk-etat-detail,
+.afk-etat-calme .afk-etat-detail { color: inherit; opacity: .85; }
+
+/* Pose seul au-dessus de la liste, le bandeau respire ; dans la barre
+   d'action du formulaire, c'est elle qui gere les ecarts. */
+[data-afk-etat] { margin: 0 0 16px; }
+.afk-form-barre [data-afk-etat] { margin: 0; }
+
+/* -------------------------------------------------------------------------
+ * Notre liste des oeuvres, et l'apercu local.
+ * ---------------------------------------------------------------------- */
+
+.afk-oeuvres-liste { display: block; }
+
+.afk-oeuvre-actions {
+	display: flex;
+	align-items: stretch;
+	gap: 8px;
+	padding: 0 14px 14px;
+}
+
+.afk-oeuvre-action {
+	flex: 1 1 0;
+	padding: 8px 10px;
+	border: 1px solid rgba( 15, 77, 115, .22 );
+	border-radius: 8px;
+	background: #fff;
+	color: var( --e-global-color-primary, #0f4d73 );
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.afk-oeuvre-action:hover { border-color: var( --e-global-color-primary, #0f4d73 ); }
+
+.afk-oeuvre-action-forte {
+	background: var( --e-global-color-primary, #0f4d73 );
+	border-color: transparent;
+	color: #fff;
+}
+
+/* Le geste destructeur reste discret : il ne se propose pas, il repond
+   a une intention. Rouge seulement au survol, pour ne pas transformer
+   chaque carte de brouillon en avertissement. */
+/* Le geste destructeur ne prend que sa place : une icone carree, en bout
+   de rangee. En toutes lettres, il chassait les deux autres hors de la
+   carte. */
+.afk-oeuvre-action-jeter {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	padding: 8px 0;
+	border-color: rgba( 179, 49, 44, .3 );
+	color: #b3312c;
+}
+
+.afk-oeuvre-action-jeter:hover {
+	border-color: #b3312c;
+	background: #fbeceb;
+}
+
+/* ⚠️ L'apercu est une fiche LOCALE, pas un lien vers la page publique :
+   sans reseau ce lien mene a l'ecran hors connexion, et l'artiste croit
+   son oeuvre perdue alors qu'elle est la, complete. */
+.afk-fiche {
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	padding: 0;
+	background: rgba( 15, 77, 115, .45 );
+	overflow-y: auto;
+}
+
+@media ( min-width: 700px ) {
+	.afk-fiche { align-items: center; padding: 24px; }
+}
+
+/* ⚠️ Le rembourrage compris dans la largeur. Sans cela, `max-width`
+   designe la seule zone de texte : la boite mesurait soixante pixels de
+   plus que ce que la regle annoncait, et debordait de son voile sur les
+   ecrans etroits. */
+.afk-fiche,
+.afk-fiche *,
+.afk-fiche *::before,
+.afk-fiche *::after { box-sizing: border-box; }
+
+.afk-fiche-boite {
+	position: relative;
+	width: 100%;
+	max-width: 720px;
+	max-height: 92vh;
+	overflow-y: auto;
+	padding: 22px;
+	border-radius: 14px 14px 0 0;
+	background: #fff;
+	color: var( --e-global-color-text, #0f4d73 );
+	font-size: 15px;
+	line-height: 1.5;
+}
+
+@media ( min-width: 700px ) {
+	.afk-fiche-boite { border-radius: 14px; }
+}
+
+/* ⚠️ Sept cent vingt pixels sur un ecran de mille quatre cents : la
+   fiche occupait la moitie de la place disponible et faisait defiler ce
+   qui tenait largement. Elle prend maintenant la largeur qu'on lui
+   donne, sans jamais coller aux bords. */
+@media ( min-width: 900px ) {
+	.afk-fiche-boite {
+		max-width: min( 92vw, 1000px );
+		max-height: 90vh;
+		padding: 26px 30px;
+	}
+}
+
+@media ( min-width: 1280px ) {
+	.afk-fiche-boite { max-width: min( 88vw, 1180px ); }
+}
+
+.afk-fiche-fermer {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: rgba( 15, 77, 115, .08 );
+	color: inherit;
+	font-size: 20px;
+	line-height: 30px;
+	cursor: pointer;
+}
+
+.afk-fiche-titre {
+	margin: 0 44px 8px 0;
+	font-family: var( --e-global-typography-primary-font-family, BrutGrotesque ), Georgia, serif;
+	font-size: 21px;
+	line-height: 1.25;
+}
+
+/* ── L'en-tete : le titre, puis ou ca en est ──────────────────────── */
+
+.afk-fiche-entete {
+	margin-bottom: 16px;
+	padding-bottom: 14px;
+	border-bottom: 1px solid rgba( 15, 77, 115, .12 );
+}
+
+.afk-fiche-reperes {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 12px;
+	margin-top: 8px;
+}
+
+.afk-fiche-reperes .afk-fiche-envoi { margin: 0; }
+
+/* ── La galerie : un grand visuel, les autres en bande ────────────── */
+
+/* ⚠️ Les visuels se suivaient a pleine largeur. Trois photos, et il
+   fallait faire defiler toute la fiche avant d'atteindre le moindre
+   texte : l'artiste ne voyait jamais ce qu'il avait saisi. */
+.afk-fiche-galerie {
+	margin: 0 0 18px;
+}
+
+.afk-fiche-grande {
+	display: block;
+	width: 100%;
+	max-height: 46vh;
+	object-fit: contain;
+	border-radius: 12px;
+	background: rgba( 15, 77, 115, .06 );
+}
+
+.afk-fiche-bande {
+	display: flex;
+	gap: 8px;
+	margin-top: 8px;
+	overflow-x: auto;
+	padding-bottom: 4px;
+	scrollbar-width: thin;
+}
+
+.afk-fiche-vignette {
+	flex: 0 0 auto;
+	width: 64px;
+	height: 64px;
+	padding: 0;
+	border: 2px solid transparent;
+	border-radius: 8px;
+	background: none;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.afk-fiche-vignette img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.afk-fiche-vignette-active { border-color: var( --e-global-color-primary, #0f4d73 ); }
+
+/* ── Deux colonnes des qu'il y a la place ─────────────────────────── */
+
+/* ⚠️ La largeur gagnee sert a montrer le visuel ET le texte ensemble,
+   pas a etirer une liste de definitions sur mille pixels — ou l'oeil
+   perd la ligne entre l'intitule et sa valeur. Le visuel reste a
+   l'ecran pendant qu'on parcourt les champs : c'est lui qu'on regarde
+   en lisant « Technique » ou « Dimensions ». */
+@media ( min-width: 900px ) {
+	.afk-fiche-avec-visuel {
+		display: grid;
+		grid-template-columns: minmax( 260px, 38% ) 1fr;
+		column-gap: 30px;
+		align-items: start;
+	}
+
+	.afk-fiche-avec-visuel .afk-fiche-entete,
+	.afk-fiche-avec-visuel .afk-fiche-pied { grid-column: 1 / -1; }
+
+	.afk-fiche-avec-visuel .afk-fiche-galerie {
+		grid-column: 1;
+		position: sticky;
+		top: 0;
+		margin-bottom: 0;
+	}
+
+	.afk-fiche-avec-visuel .afk-fiche-bloc,
+	.afk-fiche-avec-visuel .afk-fiche-vide { grid-column: 2; }
+
+	/* Le premier bloc de la colonne de droite s'aligne sur le haut du
+	   visuel, sans le trait de separation qui n'a plus lieu d'etre. */
+	.afk-fiche-avec-visuel .afk-fiche-bloc:nth-of-type( 1 ) {
+		margin-top: 0;
+		padding-top: 0;
+		border-top: 0;
+	}
+
+	.afk-fiche-avec-visuel .afk-fiche-grande { max-height: 58vh; }
+}
+
+/* ── Les champs, groupes comme au depot ───────────────────────────── */
+
+/* ⚠️ Les memes intitules que le formulaire, dans le meme ordre : ce que
+   l'artiste a rempli, il le retrouve la ou il l'a rempli. */
+.afk-fiche-bloc + .afk-fiche-bloc {
+	margin-top: 18px;
+	padding-top: 16px;
+	border-top: 1px solid rgba( 15, 77, 115, .1 );
+}
+
+.afk-fiche-section {
+	margin: 0 0 10px;
+	color: #6d8493;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: .07em;
+	text-transform: uppercase;
+}
+
+.afk-fiche-champs {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0;
+	margin: 0;
+	padding: 0;
+	font-size: 14px;
+}
+
+/* Deux colonnes des qu'il y a la place : l'intitule a gauche, la valeur
+   a droite, et l'oeil descend le long d'une seule ligne. */
+@media ( min-width: 560px ) {
+	.afk-fiche-champs {
+		grid-template-columns: minmax( 130px, 34% ) 1fr;
+		column-gap: 18px;
+	}
+
+	.afk-fiche-champs dt { margin-top: 0; }
+	.afk-fiche-champs dd { margin-top: 0; }
+	.afk-fiche-champs dt + dd { padding-bottom: 9px; }
+	.afk-fiche-champs dt { padding-bottom: 9px; }
+
+	/* Une description de dix lignes dans une colonne de deux cents
+	   pixels se lit un mot par ligne. */
+	.afk-fiche-champs dt.afk-fiche-large { grid-column: 1 / -1; padding-bottom: 2px; }
+	.afk-fiche-champs dd.afk-fiche-large { grid-column: 1 / -1; }
+}
+
+.afk-fiche-champs dt {
+	margin-top: 10px;
+	color: #6d8493;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.afk-fiche-champs dd {
+	margin: 2px 0 0;
+	color: var( --e-global-color-text, #22323d );
+	overflow-wrap: anywhere;
+	white-space: pre-line;
+}
+
+.afk-fiche-vide {
+	margin: 16px 0 0;
+	padding: 12px 14px;
+	border: 1px dashed rgba( 15, 77, 115, .28 );
+	border-radius: 10px;
+	color: #47606f;
+	font-size: 14px;
+}
+
+.afk-fiche-pied {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 22px;
+	padding-top: 16px;
+	border-top: 1px solid rgba( 15, 77, 115, .12 );
+}
+
+.afk-fiche-pied .afk-form-bouton { text-decoration: none; }
+
+/* Une question a laquelle on ne repond pas par megarde. */
+.afk-fiche-etroite { max-width: 460px; }
+
+.afk-fiche-detail {
+	margin: 8px 0 0;
+	color: #47606f;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+.afk-fiche-pied-deux {
+	gap: 10px;
+	justify-content: flex-end;
+}
+
+.afk-form-danger {
+	background: #b3312c;
+	border-color: transparent;
+	color: #fff;
+}
+
+.afk-form-danger:hover { background: #952823; }
+
+/* -------------------------------------------------------------------------
+ * La page qui mene au depot.
+ *
+ * Deux voies, et une hierarchie franche entre elles : le depot en ligne
+ * occupe la place, la methode papier reste disponible sans se disputer
+ * l'attention. La version d'origine mettait les deux sur le meme plan,
+ * avec pour bouton principal un mot souligne au milieu d'une phrase.
+ * ---------------------------------------------------------------------- */
+
+.afk-depot {
+	--afk-marine: var( --e-global-color-primary, #0f4d73 );
+	--afk-or: var( --e-global-color-accent, #d9ba61 );
+	--afk-doux: #5a7385;
+	--afk-trait: rgba( 15, 77, 115, .14 );
+
+	box-sizing: border-box;
+	max-width: 100%;
+	color: var( --afk-marine );
+	font-size: 16px;
+	line-height: 1.55;
+}
+
+.afk-depot *,
+.afk-depot *::before,
+.afk-depot *::after { box-sizing: border-box; }
+
+.afk-depot-titre {
+	margin: 0 0 18px;
+	font-family: var( --e-global-typography-primary-font-family, BrutGrotesque ), Georgia, serif;
+	font-size: clamp( 26px, 4vw, 38px );
+	line-height: 1.15;
+	color: var( --afk-marine );
+}
+
+/* ── La voie principale ────────────────────────────────────────────── */
+
+.afk-depot-voie {
+	padding: 28px;
+	border-radius: 16px;
+	background: linear-gradient( 160deg, #f4f8fa 0%, #eef4f7 100% );
+	border: 1px solid var( --afk-trait );
+}
+
+.afk-depot-chapeau {
+	margin: 0 0 22px;
+	max-width: 62ch;
+	font-size: clamp( 17px, 2vw, 19px );
+	line-height: 1.5;
+}
+
+/* ⚠️ Un vrai bouton, et non un mot souligne dans une phrase. Le geste
+   principal de cette page ne doit pas se chercher. */
+.afk-depot-action {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 54px;
+	padding: 15px 28px;
+	border-radius: 12px;
+	background: var( --afk-marine );
+	color: #fff;
+	font-size: 17px;
+	font-weight: 700;
+	text-decoration: none;
+	transition: background .15s ease, transform .15s ease;
+}
+
+.afk-depot-action:hover,
+.afk-depot-action:focus {
+	background: #0b3a58;
+	color: #fff;
+	text-decoration: none;
+}
+
+.afk-depot-action:focus-visible {
+	outline: 3px solid var( --afk-or );
+	outline-offset: 2px;
+}
+
+.afk-depot-fleche { font-size: 19px; line-height: 1; }
+
+.afk-depot-atouts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 22px;
+	margin: 22px 0 0;
+	padding: 0;
+	list-style: none;
+	font-size: 14px;
+	color: var( --afk-doux );
+}
+
+/* La coche est decorative : le texte se suffit, et un lecteur d'ecran
+   n'a pas a lire << coche >> avant chaque ligne. */
+.afk-depot-atouts li::before {
+	content: '✓';
+	margin-right: 7px;
+	color: var( --afk-or );
+	font-weight: 700;
+}
+
+/* ── La methode de secours ─────────────────────────────────────────── */
+
+.afk-depot-secours {
+	margin-top: 22px;
+	padding: 24px 26px;
+	border: 1px solid var( --afk-trait );
+	border-left: 4px solid var( --afk-or );
+	border-radius: 12px;
+	background: #fff;
+}
+
+.afk-depot-secours-titre {
+	margin: 0 0 16px;
+	font-size: 16px;
+	font-weight: 700;
+}
+
+.afk-depot-etapes {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: none;
+}
+
+.afk-depot-etapes li {
+	display: flex;
+	align-items: flex-start;
+	gap: 13px;
+	padding: 11px 0;
+	border-top: 1px solid var( --afk-trait );
+	font-size: 15px;
+}
+
+.afk-depot-etapes li:first-child { border-top: 0; padding-top: 0; }
+
+.afk-depot-rang {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: var( --afk-or );
+	color: #fff;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.afk-depot-texte { flex: 1 1 auto; min-width: 0; }
+
+.afk-depot-lien {
+	display: inline-block;
+	margin-left: 4px;
+	color: var( --afk-marine );
+	font-weight: 700;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	overflow-wrap: anywhere;
+}
+
+@media ( min-width: 860px ) {
+	.afk-depot-voie { padding: 36px 38px; }
+}
+
+/* -------------------------------------------------------------------------
+ * Arbitrage d'un conflit.
+ *
+ * On ne fusionne pas : on montre ce qui differe et on demande. Les deux
+ * versions sont donc mises cote a cote, avec la meme importance visuelle
+ * — appuyer l'une des deux serait choisir a la place de l'artiste.
+ * ---------------------------------------------------------------------- */
+
+.afk-conflit-table {
+	margin: 18px 0 0;
+	border: 1px solid var( --afk-trait, rgba( 15, 77, 115, .14 ) );
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+.afk-conflit-ligne {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0;
+	border-top: 1px solid var( --afk-trait, rgba( 15, 77, 115, .14 ) );
+}
+
+.afk-conflit-ligne:first-child { border-top: 0; }
+
+.afk-conflit-champ {
+	grid-column: 1 / -1;
+	margin: 0;
+	padding: 9px 13px 3px;
+	font-size: 13px;
+	font-weight: 700;
+	color: var( --e-global-color-primary, #0f4d73 );
+}
+
+.afk-conflit-cote {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 8px 13px 12px;
+	font-size: 14px;
+	overflow-wrap: anywhere;
+}
+
+.afk-conflit-etiquette {
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	color: #7d94a3;
+}
+
+.afk-conflit-mien { background: rgba( 15, 77, 115, .04 ); }
+.afk-conflit-sien { background: rgba( 217, 186, 97, .10 ); }
+
+@media ( min-width: 620px ) {
+	.afk-conflit-ligne { grid-template-columns: 1fr 1fr; }
+}
+
+/* -------------------------------------------------------------------------
+ * Le message d'etat, flottant.
+ *
+ * ⚠️ Il remplace un bandeau pleine largeur pose en haut du contenu. Ce
+ * bandeau ressemblait a une panne du site plutot qu'a une information
+ * sur un envoi, et il s'installait a demeure sur des pages qui n'avaient
+ * rien a voir avec le depot.
+ *
+ * Il ne s'efface pas tout seul : << hors connexion >> n'est pas une
+ * nouvelle, c'est un etat. On peut l'ecarter, il revient si la situation
+ * change.
+ * ---------------------------------------------------------------------- */
+
+/* ⚠️ Le rembourrage compris dans la hauteur.
+
+   Sans cela `min-height: 44px` designe la seule zone de texte : le lien
+   mesurait soixante-dix pixels quand le bouton voisin en faisait
+   quarante-six, parce qu'un bouton est deja en `border-box` et pas un
+   lien. Deux gestes cote a cote de hauteurs differentes se lisent comme
+   deux choses de nature differente. */
+.afk-toast,
+.afk-toast *,
+.afk-toast *::before,
+.afk-toast *::after { box-sizing: border-box; }
+
+.afk-toast {
+	position: fixed;
+	z-index: 99998;
+	left: 12px;
+	right: 12px;
+
+	/* ⚠️ Au-dessus du bandeau d'installation, quand il est la.
+	 *
+	 * Les deux s'ancrent au meme bas d'ecran et se recouvraient : le
+	 * bandeau, plus haut dans la pile, masquait l'etat du depot. La
+	 * variable est posee par ce bandeau lui-meme et vaut zero le reste du
+	 * temps — aucun des deux modules n'a besoin de connaitre l'autre. */
+	bottom: calc( 12px + var( --afk-banniere, 0px ) );
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	/* ⚠️ Plus grand, et volontairement.
+
+	   Au test client : « c'est chouette, mais il faudrait que ce pop-up
+	   soit un peu plus gros ou dans une couleur plus flashy ». Il portait
+	   la seule information que l'artiste attendait au retour du reseau —
+	   ses oeuvres n'etaient pas parties — dans un corps de treize pixels,
+	   au bas de l'ecran, en gris. */
+	flex-wrap: wrap;
+	max-width: 560px;
+	margin: 0 auto;
+
+	/* ⚠️ Resserre, sans rien perdre de ce qui le rend visible.
+	 *
+	 * Il occupait le quart d'un ecran d'iPhone quand il portait un geste :
+	 * une bande de deux cents pixels par-dessus la page, pour deux lignes
+	 * de texte. C'est l'ESPACE qui est repris — rembourrage, interligne,
+	 * une rangee de boutons au lieu de deux — jamais la couleur, le cadre
+	 * ni l'ombre, qui sont ce que le client avait demande de renforcer.
+	 * Le titre garde sa taille : c'est la premiere chose qu'on lit. */
+	padding: 12px 14px;
+	border: 2px solid rgba( 15, 77, 115, .16 );
+	border-radius: 14px;
+	background: #fff;
+	color: var( --e-global-color-text, #0f4d73 );
+	font-size: 15px;
+	line-height: 1.35;
+
+	/* L'ombre porte le message au-dessus de la page sans avoir a poser un
+	   voile : rien n'est bloque derriere lui. */
+	box-shadow: 0 6px 24px rgba( 15, 77, 115, .18 );
+}
+
+.afk-toast[hidden] { display: none; }
+
+@media ( min-width: 700px ) {
+	.afk-toast { left: auto; right: 20px; bottom: calc( 20px + var( --afk-banniere, 0px ) ); margin: 0; }
+}
+
+/* Dans le titre, et non plus a cote du bloc : elle suit la ligne de base
+   du texte au lieu de tenir une rangee a elle seule. */
+.afk-toast .afk-etat-puce {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	margin-right: 7px;
+	vertical-align: middle;
+	border-radius: 50%;
+	background: currentColor;
+}
+
+.afk-toast .afk-etat-texte { min-width: 0; }
+.afk-toast .afk-etat-titre { display: block; font-weight: 700; }
+/* Un cran sous le titre : la hierarchie se lit, et la ligne prend moins
+   de place sans devenir petite. */
+.afk-toast .afk-etat-detail { display: block; font-size: 14px; opacity: .85; }
+
+/* ⚠️ Les gestes passent a la ligne, sous le texte.
+
+   Serres a droite du message, ils tenaient sur une seule ligne tant
+   qu'il n'y en avait qu'un. A deux, l'un des deux se retrouvait rogne
+   ou renvoye a la ligne au milieu d'un mot. Une rangee a eux, sous le
+   texte, les met tous les deux a portee du pouce. */
+.afk-toast .afk-etat-action {
+	/* ⚠️ Deux gestes courts partagent une rangee.
+	 *
+	 * A `auto`, chacun prenait toute la largeur : deux rangees de
+	 * quarante-quatre pixels pour deux mots. La base a 44% les laisse se
+	 * ranger cote a cote quand ils tiennent, et passer a la ligne quand
+	 * l'un d'eux est long — ce que la rangee unique ne savait pas faire. */
+	flex: 1 1 44%;
+	/* `stretch` etirait les boutons sur toute la hauteur de la ligne
+	   flexible : soixante-dix pixels pour un mot. Quarante-quatre
+	   suffisent, et c'est la taille sous laquelle un doigt vise a cote. */
+	align-self: center;
+	min-height: 44px;
+	padding: 9px 14px;
+	border: 2px solid currentColor;
+	border-radius: 999px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-size: 14px;
+	font-weight: 700;
+	text-align: center;
+	text-decoration: none;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+/* ⚠️ Le geste principal est plein, l'autre creux.
+
+   Deux boutons de meme apparence ne disent pas lequel on attend de
+   vous. Celui qui mene a la liste — « Voir les oeuvres a envoyer » —
+   laisse relire avant de decider : c'est lui qu'on met en avant. La
+   classe est posee par le script, jamais deduite de l'ordre : un jour
+   ou l'autre l'ordre changera et la mise en avant suivrait le mauvais
+   bouton sans que rien ne le signale. */
+.afk-toast .afk-etat-action-forte {
+	background: currentColor;
+	border-color: currentColor;
+}
+
+.afk-toast .afk-etat-action-forte > span { color: #fff; }
+
+/* Le titre et le detail prennent toute la largeur : les gestes sont
+   dessous. */
+.afk-toast .afk-etat-texte { flex: 1 1 100%; }
+
+/* ⚠️ Au coin haut droit, comme partout ailleurs dans ce module.
+
+   Elle etait un element de la rangee. Depuis que les gestes passent a
+   la ligne, elle se retrouvait tout en bas, apres « Envoyer
+   maintenant » — a l'oppose de l'endroit ou l'on cherche une croix, et
+   collee au bouton qu'on ne voulait surtout pas toucher par megarde.
+
+   Meme taille et meme forme que la croix des fiches : une seule facon
+   de fermer, quel que soit ce qu'on ferme. */
+.afk-toast-fermer {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: inherit;
+	font-size: 21px;
+	line-height: 34px;
+	text-align: center;
+	opacity: .6;
+	cursor: pointer;
+}
+
+.afk-toast-fermer:hover { opacity: 1; background: rgba( 15, 77, 115, .08 ); }
+
+.afk-toast-fermer:focus-visible { opacity: 1; background: rgba( 15, 77, 115, .08 ); }
+
+/* Le texte lui reserve sa place : sans cela, un titre long passait
+   dessous. */
+.afk-toast-avec-fermer .afk-etat-texte { padding-right: 30px; }
+
+/* Memes tons que la bande, sur fond blanc : le message flotte au-dessus
+   de la page, il ne peut pas emprunter sa couleur de fond. */
+/* ⚠️ Un ton franc, pas un gris poli.
+
+   L'ambre a .45 d'opacite se confondait avec le pied de page. Ces deux
+   tons-la annoncent quelque chose que l'artiste doit faire : ils
+   prennent un cadre plein et un fond teinte. Les autres — au repos, en
+   cours — gardent leur discretion. */
+.afk-toast-grave {
+	border-color: #b3312c;
+	color: #b3312c;
+	background: #fff5f4;
+	box-shadow: 0 8px 30px rgba( 179, 49, 44, .26 );
+}
+
+.afk-toast-attente {
+	border-color: #c1720a;
+	color: #a2590a;
+	background: #fff8ec;
+	box-shadow: 0 8px 30px rgba( 193, 114, 10, .28 );
+}
+.afk-toast-marche  { border-color: rgba( 15, 77, 115, .45 ); color: #0f4d73; }
+.afk-toast-calme   { border-color: rgba( 15, 77, 115, .2 ); color: #47606f; }
+.afk-toast-bon     { border-color: rgba( 31, 122, 77, .4 ); color: #1f7a4d; }
+
+@media ( prefers-reduced-motion: reduce ) {
+	.afk-toast { transition: none !important; }
+}
+
+/* -------------------------------------------------------------------------
+ * La rondelle d'attente.
+ *
+ * ⚠️ Un point immobile ne distingue pas << en cours >> de << en attente >>,
+ * et c'est precisement la difference qui interesse : l'une part
+ * maintenant, l'autre attend un signal. Elle est decorative — le libelle
+ * a cote dit la meme chose en toutes lettres.
+ * ---------------------------------------------------------------------- */
+
+.afk-rondelle {
+	flex: 0 0 auto;
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	margin-right: 6px;
+	vertical-align: -1px;
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: afk-tourne .7s linear infinite;
+}
+
+@keyframes afk-tourne {
+	to { transform: rotate( 360deg ); }
+}
+
+/* ⚠️ Sans animation, la rondelle deviendrait un cercle fige que rien ne
+   distingue d'une pastille. On la referme donc en anneau complet : elle
+   ne tourne plus, mais elle reste un signe different. */
+@media ( prefers-reduced-motion: reduce ) {
+	.afk-rondelle {
+		animation: none;
+		border-top-color: currentColor;
+		opacity: .55;
+	}
+}
+
+/* L'etat d'envoi d'une oeuvre, dans sa fiche. */
+.afk-fiche-envoi {
+	display: flex;
+	align-items: center;
+	margin: 12px 0 0;
+	padding: 9px 12px;
+	border-radius: 10px;
+	background: rgba( 217, 186, 97, .14 );
+	color: #8a5e08;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.afk-fiche-envoi.afk-envoi-conflict,
+.afk-fiche-envoi.afk-envoi-error {
+	background: #fbeceb;
+	color: #b3312c;
+}
+
+/* Le formulaire dont l'oeuvre part : la barre d'action se teinte, sans
+   bloquer la saisie — rien n'interdit de continuer a corriger. */
+.afk-form-envoi .afk-form-barre { border-top-color: rgba( 15, 77, 115, .35 ); }
+.afk-form-envoi .afk-form-etat { color: var( --afk-marque, #0f4d73 ); font-weight: 600; }
+
+/* Une carte dont l'oeuvre part se distingue de ses voisines. */
+.afk-oeuvre[aria-busy="true"] { border-color: rgba( 217, 186, 97, .7 ); }
+
+/* -------------------------------------------------------------------------
+ * L'etat de synchronisation d'une oeuvre.
+ *
+ * ⚠️ Volontairement d'une AUTRE FORME que la pastille de publication.
+ * Les deux repondent a deux questions sans rapport — ou en est l'oeuvre
+ * sur AFRICART, ou en est-elle sur cet appareil — et deux pastilles de
+ * meme forme se lisaient comme deux valeurs d'une meme chose.
+ * ---------------------------------------------------------------------- */
+
+.afk-oeuvre-sync {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	width: 100%;
+	margin: 2px 0 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	text-align: left;
+}
+
+/* Quand elle mene quelque part, elle se comporte comme un lien : c'est
+   le chemin le plus court vers ce qu'il faut faire. */
+button.afk-oeuvre-sync {
+	cursor: pointer;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	text-decoration-thickness: 1px;
+}
+
+button.afk-oeuvre-sync:hover { text-decoration-thickness: 2px; }
+
+.afk-oeuvre-sync::before {
+	content: '';
+	flex: 0 0 auto;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: currentColor;
+}
+
+/* La rondelle remplace la puce quand ca part vraiment. */
+.afk-oeuvre-sync .afk-rondelle + * { margin-left: 0; }
+.afk-oeuvre-sync-rondelle::before { display: none; }
+
+.afk-sync-attente { color: #8a6a1b; }
+.afk-sync-grave   { color: #b3312c; }
+.afk-sync-marche  { color: #0f4d73; }
+
+/* Une oeuvre jamais partie n'a pas de statut sur le site : sa pastille
+   reste neutre, pour ne pas emprunter les couleurs d'AFRICART. */
+.afk-etat-local { color: #5a7385; }
+
+/* -------------------------------------------------------------------------
+ * L'ecran qui suit le depot.
+ *
+ * ⚠️ Le formulaire restait sur son dernier ecran, boutons grises, au
+ * milieu de trente-six champs deja remplis : rien ne disait que c'etait
+ * fini, rien n'indiquait ou aller. Un depot est un aboutissement.
+ * ---------------------------------------------------------------------- */
+
+.afk-fin {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 46vh;
+	padding: 24px 0;
+}
+
+.afk-fin-boite {
+	max-width: 520px;
+	padding: 34px 30px;
+	border: 1px solid rgba( 15, 77, 115, .14 );
+	border-radius: 16px;
+	background: #fff;
+	box-shadow: 0 2px 18px rgba( 15, 77, 115, .07 );
+	text-align: center;
+}
+
+.afk-fin-marque {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 54px;
+	height: 54px;
+	margin: 0 auto 18px;
+	border-radius: 50%;
+	background: rgba( 31, 122, 77, .12 );
+	color: #1f7a4d;
+	font-size: 26px;
+	line-height: 1;
+}
+
+.afk-fin-titre {
+	margin: 0 0 10px;
+	font-family: var( --e-global-typography-primary-font-family, BrutGrotesque ), Georgia, serif;
+	font-size: 22px;
+	line-height: 1.25;
+	color: var( --e-global-color-primary, #0f4d73 );
+}
+
+.afk-fin-detail {
+	margin: 0;
+	color: #47606f;
+	font-size: 15px;
+	line-height: 1.55;
+}
+
+.afk-fin-pied {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	justify-content: center;
+	margin-top: 24px;
+}
+
+.afk-fin-pied .afk-form-bouton { text-decoration: none; }
+
+/* La case qui reprend les informations du compte. */
+.afk-form-reprise {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	margin: 16px 0 -4px;
+	padding: 10px 13px;
+	border: 1px solid var( --afk-trait, rgba( 15, 77, 115, .16 ) );
+	border-radius: 10px;
+	background: rgba( 15, 77, 115, .03 );
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.afk-form-reprise input { width: 17px; height: 17px; margin: 0; cursor: pointer; }
+
+/* ------------------------------------------------------------------
+ * Renoncer a une demande sans issue
+ *
+ * Volontairement discret : c'est une porte de secours, pas une action
+ * courante. Elle vit sous la ligne d'etat qui la justifie, decalee de
+ * la largeur de la puce pour se lire comme sa suite et non comme un
+ * troisieme etat.
+ * ---------------------------------------------------------------- */
+.afk-oeuvre-renoncer {
+	display: inline-block;
+	margin: 4px 0 0 13px;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: #5a7385;
+	cursor: pointer;
+	font: inherit;
+	font-size: 12px;
+	text-align: left;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.afk-oeuvre-renoncer:hover { color: #b3312c; }
+
+.afk-oeuvre-renoncer:focus-visible { color: #b3312c; }
+
+/* ------------------------------------------------------------------
+ * Questions fermees : deux boutons, pas un menu
+ *
+ * ⚠️ Quarante-quatre pixels de haut au minimum. C'est la taille sous
+ * laquelle un doigt vise a cote — et ces questions se repondent au
+ * doigt, sur un telephone, dehors.
+ * ---------------------------------------------------------------- */
+.afk-choix {
+	display: flex;
+	gap: 10px;
+}
+
+.afk-choix-bouton {
+	flex: 1 1 0;
+	min-height: 46px;
+	padding: 10px 14px;
+	border: 1.5px solid var( --afk-trait, rgba( 15, 77, 115, .22 ) );
+	border-radius: 10px;
+	background: var( --afk-fond, #fff );
+	color: var( --afk-encre, #22323d );
+	cursor: pointer;
+	font: inherit;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.afk-choix-bouton:hover { border-color: var( --afk-marque, #0f4d73 ); }
+
+/* ⚠️ La reponse retenue ne se signale pas par la seule couleur : un
+   cadre epais et une coche la disent aussi. Un daltonien doit voir ce
+   qu'il a repondu. */
+.afk-choix-actif {
+	border-color: var( --afk-marque, #0f4d73 );
+	background: var( --afk-marque, #0f4d73 );
+	color: #fff;
+}
+
+.afk-choix-actif::before {
+	content: '\2713\00a0';
+	font-weight: 700;
+}
+
+.afk-choix-bouton:focus-visible {
+	outline: 2px solid var( --afk-marque, #0f4d73 );
+	outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------
+ * Un accord a donner : une case, pas une liste a une entree
+ * ---------------------------------------------------------------- */
+.afk-accord {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 46px;
+	cursor: pointer;
+}
+
+.afk-accord-case {
+	width: 22px;
+	height: 22px;
+	flex: 0 0 auto;
+	accent-color: var( --afk-marque, #0f4d73 );
+}
+
+.afk-accord-texte { font-size: 16px; font-weight: 600; }
+
+/* ------------------------------------------------------------------
+ * La liste des pays
+ * ---------------------------------------------------------------- */
+.afk-pays { position: relative; }
+
+.afk-pays-liste {
+	position: absolute;
+	z-index: 30;
+	left: 0;
+	right: 0;
+	top: 100%;
+	max-height: 264px;
+	margin: 4px 0 0;
+	padding: 4px 0;
+	list-style: none;
+	overflow-y: auto;
+	border: 1px solid var( --afk-trait, rgba( 15, 77, 115, .18 ) );
+	border-radius: 10px;
+	background: var( --afk-fond, #fff );
+	box-shadow: 0 12px 26px -14px rgba( 15, 77, 115, .5 );
+	-webkit-overflow-scrolling: touch;
+}
+
+.afk-pays-liste[hidden] { display: none; }
+
+.afk-pays-ligne {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 44px;
+	padding: 8px 14px;
+	cursor: pointer;
+	font-size: 16px;
+}
+
+.afk-pays-ligne:hover,
+.afk-pays-vise { background: rgba( 15, 77, 115, .09 ); }
+
+/* Le drapeau garde sa place meme quand le systeme ne sait pas le
+   dessiner : sans largeur fixe, les noms ne s'alignent plus. */
+.afk-pays-drapeau {
+	flex: 0 0 auto;
+	width: 26px;
+	font-size: 19px;
+	line-height: 1;
+	text-align: center;
+}
+
+.afk-pays-nom { overflow-wrap: anywhere; }
+
+/* ------------------------------------------------------------------
+ * « Envoyer » sur une carte, et « Envoyer maintenant » dans le pied
+ * ---------------------------------------------------------------- */
+
+/* ⚠️ Un envoi par oeuvre. Le message flottant envoyait tout d'un coup :
+   une oeuvre qu'on hesite a montrer partait avec les autres. */
+.afk-oeuvre-action-envoi {
+	border-color: #1f7a4d;
+	color: #1f7a4d;
+	font-weight: 700;
+}
+
+.afk-oeuvre-action-envoi:hover:not( [disabled] ) {
+	background: #1f7a4d;
+	border-color: #1f7a4d;
+	color: #fff;
+}
+
+.afk-oeuvre-action-envoi[disabled] { opacity: .55; cursor: default; }
+
+/* Dans le pied du formulaire : discret, et absent tant qu'il n'a rien a
+   faire. */
+.afk-form-envoi[hidden] { display: none; }
+
+.afk-form-envoi {
+	border-color: #1f7a4d;
+	color: #1f7a4d;
+}
+
+/* ------------------------------------------------------------------
+ * Mots cles : une etiquette par mot
+ *
+ * ⚠️ « Separes par une virgule » demandait a l'artiste de tenir la
+ * syntaxe lui-meme. Sur un telephone la virgule est sur un second
+ * clavier, et une faute de frappe devient un mot cle que personne ne
+ * voit dans une ligne de texte.
+ * ---------------------------------------------------------------- */
+.afk-mots {
+	min-height: 52px;
+	padding: 7px 8px;
+	border: 1px solid var( --afk-trait, rgba( 15, 77, 115, .22 ) );
+	border-radius: 10px;
+	background: var( --afk-fond, #fff );
+	cursor: text;
+}
+
+.afk-mots:focus-within {
+	border-color: var( --afk-marque, #0f4d73 );
+	box-shadow: 0 0 0 3px rgba( 15, 77, 115, .12 );
+}
+
+.afk-mots-rangee {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+}
+
+.afk-mot {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	max-width: 100%;
+	padding: 5px 4px 5px 11px;
+	border-radius: 999px;
+	background: rgba( 15, 77, 115, .1 );
+	color: var( --afk-marque, #0f4d73 );
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.afk-mot-texte { overflow-wrap: anywhere; }
+
+/* ⚠️ Vingt-huit pixels, pas seize : c'est une cible tactile, et une
+   croix qu'on rate efface le mot voisin. */
+.afk-mot-oter {
+	flex: 0 0 auto;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
+	font-size: 17px;
+	line-height: 24px;
+	opacity: .7;
+}
+
+.afk-mot-oter:hover { opacity: 1; background: rgba( 15, 77, 115, .16 ); }
+
+.afk-mot-oter:focus-visible { opacity: 1; background: rgba( 15, 77, 115, .16 ); }
+
+/* La ligne de saisie prend la place qui reste, et jamais moins que de
+   quoi lire ce qu'on tape. */
+.afk-mots-saisie {
+	flex: 1 1 140px;
+	min-width: 140px;
+	min-height: 36px;
+	padding: 4px 6px;
+	border: 0;
+	background: none;
+	color: inherit;
+	font: inherit;
+
+	/* ⚠️ Seize pixels au minimum : en dessous, iOS zoome sur le champ
+	   touche et ne dezoome jamais. */
+	font-size: 16px;
+	outline: none;
+}
+
+/* ------------------------------------------------------------------
+ * Telephone : l'indicatif a gauche, le numero a droite
+ *
+ * ⚠️ Une seule ligne demandait a l'artiste de connaitre et de taper son
+ * indicatif. La plupart ecrivaient leur numero local, parfaitement
+ * lisible a Abidjan et incomposable depuis Paris.
+ * ---------------------------------------------------------------- */
+.afk-tel {
+	position: relative;
+	display: flex;
+	gap: 8px;
+	align-items: stretch;
+}
+
+.afk-tel-pays {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	min-height: 46px;
+	padding: 0 13px;
+	border: 1px solid var( --afk-trait, rgba( 15, 77, 115, .22 ) );
+	border-radius: 10px;
+	background: var( --afk-fond, #fff );
+	color: var( --afk-encre, #22323d );
+	cursor: pointer;
+	font: inherit;
+	font-size: 16px;
+	white-space: nowrap;
+}
+
+.afk-tel-pays:hover { border-color: var( --afk-marque, #0f4d73 ); }
+
+.afk-tel-pays[aria-expanded="true"] {
+	border-color: var( --afk-marque, #0f4d73 );
+	box-shadow: 0 0 0 3px rgba( 15, 77, 115, .12 );
+}
+
+/* Le drapeau garde sa largeur meme quand le systeme ne sait pas le
+   dessiner et affiche les deux lettres du pays a la place. */
+.afk-tel-drapeau {
+	flex: 0 0 auto;
+	width: 24px;
+	font-size: 18px;
+	line-height: 1;
+	text-align: center;
+}
+
+.afk-tel-code { font-weight: 600; }
+
+.afk-tel-numero {
+	flex: 1 1 auto;
+	min-width: 0;
+	min-height: 46px;
+	padding: 11px 13px;
+	border: 1px solid var( --afk-trait, rgba( 15, 77, 115, .22 ) );
+	border-radius: 10px;
+	background: var( --afk-fond, #fff );
+	color: var( --afk-encre, #22323d );
+	font: inherit;
+
+	/* ⚠️ Seize pixels au minimum : en dessous, iOS zoome sur le champ
+	   touche et ne dezoome jamais. */
+	font-size: 16px;
+	letter-spacing: .02em;
+}
+
+.afk-tel-numero:focus {
+	border-color: var( --afk-marque, #0f4d73 );
+	box-shadow: 0 0 0 3px rgba( 15, 77, 115, .12 );
+	outline: none;
+}
+
+/* Le tiroir de recherche, pose sous l'indicatif. */
+.afk-tel-tiroir {
+	position: absolute;
+	z-index: 30;
+	top: calc( 100% + 4px );
+	left: 0;
+	width: min( 340px, 100% );
+	border: 1px solid var( --afk-trait, rgba( 15, 77, 115, .18 ) );
+	border-radius: 10px;
+	background: var( --afk-fond, #fff );
+	box-shadow: 0 12px 26px -14px rgba( 15, 77, 115, .5 );
+	overflow: hidden;
+}
+
+.afk-tel-tiroir[hidden] { display: none; }
+
+.afk-tel-cherche {
+	display: block;
+	width: 100%;
+	min-height: 44px;
+	padding: 11px 14px;
+	border: 0;
+	border-bottom: 1px solid rgba( 15, 77, 115, .14 );
+	background: none;
+	color: inherit;
+	font: inherit;
+	font-size: 16px;
+	outline: none;
+}
+
+.afk-tel-liste {
+	max-height: 248px;
+	margin: 0;
+	padding: 4px 0;
+	list-style: none;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.afk-tel-liste[hidden] { display: none; }
+
+.afk-tel-ligne {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	min-height: 44px;
+	padding: 8px 14px;
+	cursor: pointer;
+	font-size: 15px;
+}
+
+.afk-tel-ligne:hover,
+.afk-tel-ligne[aria-selected="true"] { background: rgba( 15, 77, 115, .09 ); }
+
+.afk-tel-nom { flex: 1 1 auto; overflow-wrap: anywhere; }
+
+.afk-tel-indicatif {
+	flex: 0 0 auto;
+	color: #6d8493;
+	font-variant-numeric: tabular-nums;
+	font-weight: 600;
+}
+
+/* ------------------------------------------------------------------
+ * La barre d'etapes
+ *
+ * ⚠️ Pour revenir sur le nom de l'artiste depuis la derniere etape, il
+ * fallait trois « Precedent » — et pour repartir, trois « Suivant »,
+ * chacun exigeant que l'ecran soit valide. Relire sa saisie devenait un
+ * parcours d'obstacles, et l'artiste renoncait a verifier.
+ * ---------------------------------------------------------------- */
+.afk-pas {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 6px;
+	margin: 0 0 8px;
+	padding: 0 0 2px;
+	list-style: none;
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+.afk-pas::-webkit-scrollbar { display: none; }
+.afk-pas[hidden] { display: none; }
+
+.afk-pas-item { flex: 1 1 0; min-width: 0; }
+
+.afk-pas-bouton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	width: 100%;
+
+	/* ⚠️ Quarante-quatre pixels : c'est la taille sous laquelle un doigt
+	   vise a cote, et ces boutons sont serres les uns contre les autres. */
+	min-height: 44px;
+	padding: 8px 10px;
+	border: 1px solid transparent;
+	border-radius: 999px;
+	background: transparent;
+	color: #6d8493;
+	cursor: pointer;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.afk-pas-bouton:hover { background: rgba( 15, 77, 115, .07 ); color: var( --afk-marque, #0f4d73 ); }
+
+.afk-pas-bouton:focus-visible {
+	outline: 2px solid var( --afk-marque, #0f4d73 );
+	outline-offset: 1px;
+}
+
+/* La pastille numerotee, seul repere qui subsiste quand la place manque. */
+.afk-pas-puce {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: rgba( 15, 77, 115, .12 );
+	color: inherit;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.afk-pas-nom {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* L'etape courante : pleine, elle se distingue sans lire. */
+.afk-pas-ici {
+	background: rgba( 15, 77, 115, .1 );
+	border-color: rgba( 15, 77, 115, .22 );
+	color: var( --afk-marque, #0f4d73 );
+}
+
+.afk-pas-ici .afk-pas-puce {
+	background: var( --afk-marque, #0f4d73 );
+	color: #fff;
+}
+
+/* ⚠️ Une etape incomplete se signale — mais seulement une fois vue, et
+   jamais celle ou l'on se trouve : on n'a pas fini d'y ecrire. */
+.afk-pas-manque { color: #b3312c; }
+
+.afk-pas-manque .afk-pas-puce {
+	background: #b3312c;
+	color: #fff;
+}
+
+/* Sur telephone, les noms tombent et les pastilles restent : quatre
+   noms alignes sur trois cent cinquante pixels ne se lisent pas. */
+@media ( max-width: 560px ) {
+	.afk-pas-nom { display: none; }
+	.afk-pas-item { flex: 0 0 auto; }
+	.afk-pas-bouton { padding: 8px; }
+
+	/* Celle ou l'on se trouve garde son nom : c'est la seule qu'on a
+	   besoin de lire. */
+	.afk-pas-ici .afk-pas-nom { display: block; }
+}
+
+/* ==================================================================
+ * L'EN-TETE
+ *
+ * ⚠️ Le menu de profil ne s'affichait pas sur telephone : l'artiste
+ * connecte n'avait aucun chemin vers ses oeuvres ni vers la
+ * deconnexion. Signale au test client.
+ *
+ * Un seul point de rupture, 900 pixels : au-dessus le menu s'etale,
+ * en dessous il se replie. Multiplier les paliers aurait fait trois
+ * mises en page a verifier au lieu de deux.
+ * ================================================================== */
+
+.afk-entete,
+.afk-entete *,
+.afk-entete *::before,
+.afk-entete *::after { box-sizing: border-box; }
+
+/* ⚠️ Les couleurs de l'en-tete sont les siennes, et il les impose.
+ *
+ * Sur telephone, le menu s'affichait en or pale sur bleu clair :
+ * illisible. La cause n'etait pas la palette du site — elle est juste,
+ * #0F4D73 sur blanc — mais une regle du theme qui colore TOUS les liens
+ * en `--e-global-color-secondary` avec `!important`. Mon `color:
+ * inherit` n'avait aucune chance.
+ *
+ * D'ou ces variables, definies ici et non empruntees, et le `!important`
+ * qui les applique. En poser un ne se fait pas a la legere : celui-ci
+ * est strictement borne a `.afk-entete`, il ne deborde sur rien, et il
+ * repond a un `!important` d'en face qu'on ne peut pas retirer sans
+ * modifier le theme — ce que ce lot s'interdit.
+ *
+ * Contraste mesure au banc, et pas estime : 8,6:1 pour le texte des
+ * entrees, la ou la norme AA en demande 4,5. */
+.afk-entete {
+	--afk-entete-fond: #fff;
+	--afk-entete-encre: #123c56;
+	--afk-entete-doux: #4a6a7e;
+	--afk-entete-trait: rgba( 18, 60, 86, .16 );
+	--afk-entete-survol: rgba( 18, 60, 86, .08 );
+	--afk-entete-marque: #0f4d73;
+
+	position: relative;
+	z-index: 60;
+
+	/* Opaque, toujours. Un en-tete a travers lequel on voit la page se
+	   confond avec elle des qu'on defile. */
+	background: var( --afk-entete-fond );
+	border-bottom: 1px solid var( --afk-entete-trait );
+	color: var( --afk-entete-encre );
+	font-family: inherit;
+}
+
+/* ⚠️ Une surface ouverte passe DEVANT le message flottant.
+ *
+ * Le message d'etat vit a 99998, l'en-tete a 60 : le menu deroule sur
+ * telephone passait donc dessous, et ses dernieres entrees etaient
+ * illisibles — « le menu et le popup se superposent et le menu n'est pas
+ * visible ». Signale au test.
+ *
+ * Tant qu'un panneau est ouvert, il est ce que l'artiste regarde : il
+ * prend le dessus, voile compris, et le message reapparait des qu'on
+ * referme. Il n'est ni masque ni retire — seulement recouvert le temps
+ * du geste. */
+.afk-entete-ouvert,
+.afk-compte-ouvert,
+.afk-cloche-ouverte { z-index: 99999; }
+
+/* ⚠️ Le seul `!important` de cette feuille, et il est cerne : il ne
+   vise que les textes de NOTRE en-tete, et defait une regle de theme
+   qui colore tous les liens du site sans distinction. */
+.afk-entete .afk-entree-lien,
+.afk-entete .afk-entete-nom,
+.afk-entete .afk-compte-nom,
+.afk-entete .afk-compte-entete,
+.afk-entete .afk-panneau-titre { color: var( --afk-entete-encre ) !important; }
+
+.afk-entete .afk-panneau-titre,
+.afk-entete .afk-compte-entete { color: var( --afk-entete-doux ) !important; }
+
+/* ⚠️ `sticky` et non `fixed` : l'en-tete garde sa place dans le flux,
+   et le contenu ne passe pas dessous au chargement. La barre d'etapes
+   du formulaire mesure sa hauteur pour se coller juste en dessous. */
+.afk-entete-collant {
+	position: sticky;
+	top: 0;
+}
+
+.afk-entete-barre {
+	/* Le repere de l'ancrage du logo centre sur telephone. */
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 10px 16px;
+}
+
+/* ── La marque ──────────────────────────────────────────────────── */
+
+.afk-entete-marque {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	text-decoration: none;
+	color: inherit;
+}
+
+.afk-entete-logo { display: block; width: auto; }
+
+/* ⚠️ La marque accompagne le menu replie, et s'arrete avec lui.
+ *
+ * Elle est donc presente — et centree — de zero a 1199 pixels :
+ * telephone ET tablette, portrait comme paysage. C'est exactement la
+ * plage ou le menu du site est range derriere le bouton accordeon, et
+ * ou la barre serait sinon vide en son milieu.
+ *
+ * A partir de 1200, le menu se deplie et prend cette place ; l'en-tete
+ * du site, qui porte deja le logo, est alors visible juste au-dessus.
+ * Le repeter donnerait deux fois la meme image a dix centimetres
+ * d'ecart.
+ *
+ * Un seul palier pour les deux decisions : deux valeurs qui divergent
+ * laisseraient une largeur ou le logo cotoie le menu deplie. */
+@media ( min-width: 1200px ) {
+	.afk-entete-marque-mobile { display: none; }
+}
+
+.afk-entete-nom {
+	font-size: 20px;
+	font-weight: 800;
+	letter-spacing: -.01em;
+}
+
+/* ── Le menu du site ────────────────────────────────────────────── */
+
+/* ⚠️ Le menu prend la place laissee libre, avec ou sans marque : c'est
+   lui le contenu de cette barre. */
+.afk-entete-nav { flex: 1 1 auto; min-width: 0; }
+
+.afk-entete-menu {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.afk-entree { position: relative; }
+
+.afk-entree-lien {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+
+	/* ⚠️ Quarante-quatre pixels : la taille sous laquelle un doigt vise
+	   a cote, et ces entrees sont serrees les unes contre les autres. */
+	min-height: 44px;
+	padding: 9px 12px;
+	border: 0;
+	border-radius: 8px;
+	background: none;
+	color: inherit;
+	cursor: pointer;
+	font: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.afk-entree-lien:hover { background: var( --afk-entete-survol ); }
+
+.afk-entree-lien:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: -2px;
+}
+
+/* La page ou l'on se trouve, soulignee : la couleur seule ne se voit
+   pas sur un menu deja colore. */
+/* La page ou l'on se trouve : un fond, un soulignement ET une barre a
+   gauche. La couleur seule ne suffit pas a qui ne la distingue pas. */
+.afk-entree-lien[aria-current="page"] {
+	background: var( --afk-entete-survol );
+	box-shadow: inset 3px 0 0 var( --afk-entete-marque );
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.afk-entree-chevron {
+	width: 8px;
+	height: 8px;
+	border-right: 2px solid currentColor;
+	border-bottom: 2px solid currentColor;
+	transform: rotate( 45deg ) translate( -2px, -2px );
+	transition: transform .15s;
+}
+
+.afk-entree-ouverte .afk-entree-chevron { transform: rotate( -135deg ) translate( -3px, -3px ); }
+
+/* ── Les sous-menus ─────────────────────────────────────────────── */
+
+/* ⚠️ Ouverts au clic, jamais au survol : sur un ecran tactile il n'y a
+   pas de survol, et les trois pages « A propos » etaient inatteignables
+   au doigt. */
+.afk-sous-menu {
+	position: absolute;
+	top: calc( 100% + 4px );
+	left: 0;
+	min-width: 220px;
+	margin: 0;
+	padding: 6px;
+	list-style: none;
+	border: 1px solid var( --afk-entete-trait );
+	border-radius: 12px;
+	background: var( --afk-entete-fond );
+	box-shadow: 0 14px 30px -16px rgba( 15, 77, 115, .55 );
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY( -4px );
+	transition: opacity .14s, transform .14s, visibility .14s;
+}
+
+.afk-entree-ouverte > .afk-sous-menu {
+	opacity: 1;
+	visibility: visible;
+	transform: none;
+}
+
+.afk-sous-menu .afk-entree-lien { white-space: normal; }
+
+/* ── Le cote droit ──────────────────────────────────────────────── */
+
+/* ⚠️ Les gestes sont TOUJOURS a droite.
+
+   La regle ne valait d'abord que pour une barre sans marque. Depuis que
+   le logo est sorti du flux pour se centrer sur telephone, il ne pousse
+   plus rien : la cloche et le compte revenaient se coller au bouton du
+   menu, a gauche, et le logo centre leur passait dessus. Mesure au banc :
+   les gestes commencaient a 74 pixels sur un ecran de 390.
+
+   Rien ne justifie de les mettre ailleurs qu'a droite, quelle que soit
+   la marque : la regle devient inconditionnelle. */
+.afk-entete-cote {
+	margin-left: auto;
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.afk-entete-action {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
+	padding: 10px 18px;
+	border-radius: 999px;
+	background: var( --afk-entete-marque );
+	color: #fff !important;
+	font-size: 14px;
+	font-weight: 700;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.afk-entete-action:hover { filter: brightness( 1.12 ); }
+
+.afk-entete-connexion {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
+	padding: 10px 16px;
+	border: 1.5px solid currentColor;
+	border-radius: 999px;
+	color: inherit;
+	font-size: 14px;
+	font-weight: 700;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+/* ── Le compte ──────────────────────────────────────────────────── */
+
+.afk-compte { position: relative; }
+
+.afk-compte-bouton {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 44px;
+	padding: 4px 10px 4px 4px;
+	border: 1px solid var( --afk-entete-trait );
+	border-radius: 999px;
+	background: var( --afk-entete-fond );
+	color: var( --afk-entete-encre );
+	cursor: pointer;
+	font: inherit;
+}
+
+.afk-compte-bouton:hover { border-color: currentColor; }
+
+/* ⚠️ Sans fond. L'avatar par defaut du site est un bonhomme blanc sur
+   pastille bleue : pose dans un bouton rond deja cercle, il donnait un
+   rond bleu dans un rond blanc, et cette couleur pleine tirait l'oeil
+   plus que tout le reste de la barre alors qu'elle ne dit rien. On ne
+   peut pas retirer le fond d'un PNG : le script n'affiche donc l'image
+   que si l'artiste en a choisi une, et dessine un trait sinon. */
+.afk-compte-avatar {
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.afk-compte-visage {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	color: var( --afk-entete-marque );
+}
+
+.afk-compte-nom {
+	max-width: 130px;
+	overflow: hidden;
+	font-size: 14px;
+	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.afk-compte-fleche {
+	width: 7px;
+	height: 7px;
+	border-right: 2px solid currentColor;
+	border-bottom: 2px solid currentColor;
+	transform: rotate( 45deg ) translate( -2px, -2px );
+}
+
+/* Ce qui attend d'etre envoye, sur l'avatar : c'est la seule chose que
+   l'artiste doit voir depuis n'importe quelle page du site. */
+.afk-compte-pastille {
+	position: absolute;
+	top: -2px;
+	left: 26px;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 5px;
+	border: 2px solid #fff;
+	border-radius: 999px;
+	background: #c1720a;
+	color: #fff;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 16px;
+	text-align: center;
+}
+
+.afk-compte-tiroir {
+	position: absolute;
+	top: calc( 100% + 6px );
+	right: 0;
+	min-width: 240px;
+	padding: 8px;
+	border: 1px solid var( --afk-entete-trait );
+	border-radius: 14px;
+	background: var( --afk-entete-fond );
+	box-shadow: 0 16px 34px -18px rgba( 0, 0, 0, .45 );
+}
+
+.afk-compte-tiroir[hidden] { display: none; }
+
+.afk-compte-entete {
+	margin: 2px 6px 8px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var( --afk-entete-trait );
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.afk-compte-menu,
+.afk-panneau-menu {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.afk-compte-menu .afk-entree-lien { width: 100%; }
+
+/* ── Le bouton du menu, et le panneau ───────────────────────────── */
+
+.afk-entete-burger {
+	display: none;
+	flex: 0 0 auto;
+	flex-direction: column;
+	justify-content: center;
+	gap: 5px;
+	width: 44px;
+	height: 44px;
+	padding: 0 10px;
+	border: 0;
+	border-radius: 10px;
+	background: none;
+	cursor: pointer;
+}
+
+.afk-burger-trait {
+	display: block;
+	height: 2px;
+	border-radius: 2px;
+	background: currentColor;
+	transition: transform .16s, opacity .16s;
+}
+
+.afk-entete-ouvert .afk-burger-trait:nth-child( 1 ) { transform: translateY( 7px ) rotate( 45deg ); }
+.afk-entete-ouvert .afk-burger-trait:nth-child( 2 ) { opacity: 0; }
+.afk-entete-ouvert .afk-burger-trait:nth-child( 3 ) { transform: translateY( -7px ) rotate( -45deg ); }
+
+.afk-entete-panneau { display: none; }
+.afk-entete-voile { display: none; }
+
+.afk-panneau-compte {
+	margin-top: 10px;
+	padding-top: 12px;
+	border-top: 1px solid var( --afk-entete-trait );
+}
+
+.afk-panneau-titre {
+	margin: 0 12px 6px;
+	color: var( --afk-entete-doux );
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+}
+
+.afk-panneau-menu .afk-entree-lien {
+	min-height: 50px;
+	font-size: 16px;
+}
+
+/* La page ne defile plus derriere un panneau ouvert : un geste vers le
+   bas dans le menu faisait glisser la page en dessous. */
+.afk-sans-defilement,
+.afk-sans-defilement body { overflow: hidden; }
+
+/* ==================================================================
+ * TELEPHONE ET TABLETTE
+ *
+ * ⚠️ Le repli est a 1200 pixels, et ce n'est pas un chiffre rond choisi
+ * au hasard : c'est une mesure.
+ *
+ * Les intitules de ce site sont longs — « CONSULTER TOUTES LES OEUVRES »,
+ * « A PROPOS D'AFRICART » — et le menu reclame 777 pixels a lui seul. A
+ * 900, il n'en avait que 653 : il debordait sur le compte et le bouton
+ * de depot chevauchait le texte. Constate sur une tablette.
+ *
+ * Il tient tout juste a 1024, ce qui ne laisse aucune marge pour un
+ * libelle de plus ou une autre police. A 1200 il dispose de 953 pixels
+ * pour 777, et les tablettes en paysage — iPad a 1024, iPad Pro a 1194 —
+ * recoivent le menu replie, comme demande.
+ * ================================================================== */
+
+@media ( max-width: 1199px ) {
+	.afk-entete-burger { display: flex; }
+
+	/* Le menu du site se replie ; le compte, lui, RESTE dans la barre.
+	   C'est tout l'objet de cette reprise : l'artiste doit voir qu'il
+	   est connecte et atteindre ses oeuvres d'un seul geste. */
+	.afk-entete-nav { display: none; }
+
+	/* ⚠️ Au centre exact, et non « au milieu de ce qui reste ».
+
+	   Le bouton du menu pese quarante-quatre pixels a gauche, la cloche
+	   et le compte pres de cent a droite : pose dans le flux, le logo
+	   aurait ete decale vers la gauche sans que rien ne l'explique. Sorti
+	   du flux et ancre a la moitie de la barre, il est centre quoi que
+	   pesent ses voisins.
+
+	   La largeur est bornee pour qu'il ne passe jamais dessous : sur un
+	   telephone de 390 pixels, il en reste 250 entre les deux.
+
+	   ⚠️ La regle vise TOUTE marque, pas seulement celle qui s'efface a
+	   la tablette. Elle ne valait d'abord que pour `marque="mobile"` :
+	   qui demandait `marque="oui"` — pour garder son logo partout —
+	   obtenait un logo colle a gauche, sans que rien ne l'explique. Au
+	   petit format, une marque se centre, quelle que soit la raison de sa
+	   presence. */
+	/* ⚠️ Centre entre les deux groupes, et non au milieu de la barre.
+	 *
+	 * L'ancrage a 50 % posait le logo au centre GEOMETRIQUE : parfait au
+	 * decimetre pres, et visiblement de travers. Les deux groupes qui
+	 * l'encadrent n'ont pas la meme largeur — 44 pixels pour le bouton
+	 * accordeon, 113 pour la cloche et le compte — si bien qu'a 390
+	 * pixels il restait 115 pixels de vide a gauche du logo contre 45 a
+	 * droite. L'oeil ne mesure pas depuis les bords de l'ecran, il compare
+	 * les deux blancs : le logo paraissait pousse vers la droite. Et sur
+	 * un ecran de 295 pixels, il CHEVAUCHAIT la cloche.
+	 *
+	 * Une grille de trois colonnes — le bouton, l'espace libre, les
+	 * gestes — met le logo au milieu de ce qui reste. Les deux blancs
+	 * deviennent egaux par construction, quelle que soit la largeur des
+	 * cotes : un geste ajoute a droite un jour ne desalignera rien.
+	 */
+	.afk-entete-barre {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+	}
+
+	.afk-entete-marque {
+		position: static;
+		left: auto;
+		justify-self: center;
+		max-width: 100%;
+		transform: none;
+	}
+
+	.afk-entete-marque .afk-entete-nom {
+		display: block;
+		overflow: hidden;
+		font-size: 18px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* Le logo ne deborde jamais de la place qu'on lui laisse : sans
+	   cela, une image large sortait de son ancre et repassait sous la
+	   cloche. */
+	.afk-entete-marque .afk-entete-logo {
+		max-width: 100%;
+		object-fit: contain;
+	}
+
+
+	/* ⚠️ Le depot ne disparait pas, il se resserre.
+
+	   Le cacher sur telephone laissait le geste principal de
+	   l'application au fond d'un menu, sur l'appareil ou il sert le
+	   plus. En pastille il tient a cote de l'avatar, et reprend le « + »
+	   de la tuile qui ouvre la liste des oeuvres — le meme signe pour le
+	   meme geste, aux deux endroits ou on le cherche. */
+	.afk-entete-action {
+		width: 44px;
+		height: 44px;
+		padding: 0;
+		justify-content: center;
+		overflow: hidden;
+		text-indent: -9999px;
+	}
+
+	.afk-entete-action::after {
+		content: '+';
+		font-size: 26px;
+		font-weight: 400;
+		line-height: 1;
+		text-indent: 0;
+	}
+
+	.afk-compte-nom { display: none; }
+
+	.afk-compte-bouton { padding: 4px; }
+
+	/* ⚠️ Son propre fond, opaque. Sans lui, le panneau prenait celui de
+	   l'en-tete par transparence et l'on voyait la page defiler derriere
+	   les entrees du menu. */
+	.afk-entete-panneau {
+		display: block;
+		max-height: calc( 100vh - 64px );
+		padding: 8px 10px 18px;
+		border-top: 1px solid var( --afk-entete-trait );
+		background: var( --afk-entete-fond );
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.afk-entete-panneau[hidden] { display: none; }
+
+	/* ⚠️ Le tiroir du compte monte du bas : c'est la que le pouce
+	   arrive, et une liste ancree en haut a droite s'atteint mal d'une
+	   seule main sur un grand telephone. */
+	.afk-compte-tiroir {
+		position: fixed;
+		top: auto;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		min-width: 0;
+		padding: 10px 12px calc( 18px + env( safe-area-inset-bottom, 0px ) );
+		border: 0;
+		border-radius: 18px 18px 0 0;
+		background: var( --afk-entete-fond );
+		box-shadow: 0 -10px 40px -14px rgba( 0, 0, 0, .45 );
+	}
+
+	.afk-compte-tiroir .afk-entree-lien {
+		min-height: 52px;
+		font-size: 16px;
+	}
+
+	.afk-compte-entete { font-size: 15px; }
+
+	.afk-entete-voile {
+		display: block;
+		position: fixed;
+		z-index: -1;
+		inset: 0;
+		background: rgba( 6, 24, 36, .55 );
+	}
+
+	.afk-entete-voile[hidden] { display: none; }
+
+	/* Sur telephone, un sous-menu se deplie dans le flux : superpose, il
+	   sortait de l'ecran par la droite. */
+	.afk-sous-menu {
+		position: static;
+		min-width: 0;
+		margin: 2px 0 6px 14px;
+		border: 0;
+		border-left: 2px solid rgba( 15, 77, 115, .16 );
+		border-radius: 0;
+		box-shadow: none;
+		opacity: 1;
+		visibility: visible;
+		transform: none;
+		display: none;
+	}
+
+	.afk-entree-ouverte > .afk-sous-menu { display: block; }
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+	.afk-sous-menu,
+	.afk-burger-trait,
+	.afk-entree-chevron { transition: none; }
+}
+
+/* ------------------------------------------------------------------
+ * Le message eclair
+ *
+ * ⚠️ La ligne d'etat du pied de page ne suffisait pas : en petit, en
+ * gris, tout en bas — a l'endroit exact ou l'artiste ne regarde pas au
+ * moment ou il vient de cliquer en haut. « Rien n'a ete modifie depuis
+ * l'ouverture » s'y affichait sans que personne le voie, et l'on
+ * concluait a une panne. Signale au test.
+ *
+ * Celui-ci passe devant la page, en haut au milieu, et s'en va seul au
+ * bout de trois secondes. Il ne porte QUE des confirmations : un refus
+ * de validation doit rester a l'ecran jusqu'a ce qu'on l'ait traite.
+ * ---------------------------------------------------------------- */
+.afk-eclair {
+	position: fixed;
+	z-index: 99999;
+	top: calc( 14px + env( safe-area-inset-top, 0px ) );
+	left: 50%;
+	max-width: min( 92vw, 460px );
+	padding: 13px 20px;
+	border-radius: 999px;
+	background: #12603c;
+	box-shadow: 0 10px 30px -10px rgba( 0, 0, 0, .45 );
+	color: #fff;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.35;
+	text-align: center;
+
+	/* Hors d'atteinte tant qu'il n'est pas montre : un message invisible
+	   ne doit intercepter aucun clic. */
+	opacity: 0;
+	pointer-events: none;
+	transform: translate( -50%, -14px );
+	transition: opacity .18s ease, transform .18s ease;
+}
+
+.afk-eclair-vu {
+	opacity: 1;
+	transform: translate( -50%, 0 );
+}
+
+.afk-eclair-calme { background: #0f4d73; }
+
+@media ( prefers-reduced-motion: reduce ) {
+	.afk-eclair { transition: opacity .18s ease; transform: translate( -50%, 0 ); }
+}
+
+/* ------------------------------------------------------------------
+ * Le choix de langue, rendu par le code court du site
+ * ---------------------------------------------------------------- */
+.afk-entete-langues {
+	display: flex;
+	align-items: center;
+	max-width: 170px;
+	overflow: hidden;
+}
+
+/* Le plugin de traduction pose ses propres marges : on les neutralise
+   pour qu'il tienne sur la meme ligne que le reste. */
+.afk-entete-langues p,
+.afk-entete-langues div { margin: 0; }
+.afk-entete-langues img { display: inline-block; vertical-align: middle; }
+
+/* ------------------------------------------------------------------
+ * La cloche des notifications
+ * ---------------------------------------------------------------- */
+.afk-cloche { position: relative; }
+
+.afk-cloche-bouton {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 1px solid transparent;
+	border-radius: 999px;
+	background: transparent;
+	color: var( --afk-entete-encre );
+	cursor: pointer;
+}
+
+.afk-cloche-bouton:hover { background: var( --afk-entete-survol ); }
+
+.afk-cloche-ouverte .afk-cloche-bouton {
+	background: var( --afk-entete-survol );
+	border-color: var( --afk-entete-trait );
+}
+
+/* Le nombre non lu, pose sur la cloche : c'est la seule chose qu'on
+   cherche du regard en arrivant. */
+.afk-cloche-pastille {
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 4px;
+	border: 2px solid var( --afk-entete-fond );
+	border-radius: 999px;
+	background: #b3312c;
+	color: #fff;
+	font-size: 10px;
+	font-weight: 700;
+	line-height: 14px;
+	text-align: center;
+}
+
+.afk-cloche-tiroir {
+	position: absolute;
+	top: calc( 100% + 6px );
+	right: 0;
+	width: min( 340px, 92vw );
+	border: 1px solid var( --afk-entete-trait );
+	border-radius: 14px;
+	background: var( --afk-entete-fond );
+	box-shadow: 0 16px 34px -18px rgba( 0, 0, 0, .45 );
+	overflow: hidden;
+}
+
+.afk-cloche-tiroir[hidden] { display: none; }
+
+.afk-cloche-entete {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 11px 14px;
+	border-bottom: 1px solid var( --afk-entete-trait );
+	font-size: 14px;
+	font-weight: 700;
+}
+
+.afk-cloche-vider {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border: 1px solid var( --afk-entete-trait );
+	border-radius: 999px;
+	background: transparent;
+	color: var( --afk-entete-doux );
+	cursor: pointer;
+}
+
+.afk-cloche-vider:hover { color: #b3312c; border-color: #b3312c; }
+
+.afk-cloche-liste {
+	max-height: min( 60vh, 420px );
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.afk-cloche-attente {
+	margin: 0;
+	padding: 18px 14px;
+	color: var( --afk-entete-doux );
+	font-size: 14px;
+	text-align: center;
+}
+
+.afk-notif {
+	display: flex;
+	align-items: flex-start;
+	gap: 11px;
+	padding: 12px 14px;
+	border-bottom: 1px solid var( --afk-entete-trait );
+	color: var( --afk-entete-encre ) !important;
+	text-decoration: none;
+}
+
+.afk-notif:last-child { border-bottom: 0; }
+.afk-notif:hover { background: var( --afk-entete-survol ); }
+
+/* Non lue : une barre a gauche ET un fond. La couleur seule ne se
+   distingue pas d'une ligne survolee. */
+.afk-notif-neuve {
+	background: rgba( 193, 114, 10, .08 );
+	box-shadow: inset 3px 0 0 #c1720a;
+}
+
+.afk-notif-image {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	background: var( --afk-entete-survol );
+	overflow: hidden;
+}
+
+.afk-notif-image img { width: 100%; height: 100%; object-fit: cover; }
+
+.afk-notif-texte {
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.afk-notif-sujet {
+	font-size: 14px;
+	line-height: 1.35;
+	overflow-wrap: anywhere;
+}
+
+.afk-notif-date {
+	color: var( --afk-entete-doux );
+	font-size: 12px;
+}
+
+/* Meme palier que le bloc principal de l'en-tete : 1200. */
+@media ( max-width: 1199px ) {
+	/* Le choix de langue descend dans le panneau : quatre gestes dans
+	   une barre de trois cent quatre-vingt-dix pixels ne tiennent pas. */
+	.afk-entete-langues { display: none; }
+
+	.afk-entete-panneau .afk-entete-langues {
+		display: flex;
+		max-width: none;
+		margin: 10px 12px 0;
+		padding-top: 12px;
+		border-top: 1px solid var( --afk-entete-trait );
+	}
+
+	/* La cloche, elle, reste : c'est une nouvelle qui arrive, et la
+	   cacher dans un menu revient a ne pas la donner. */
+	.afk-cloche-tiroir {
+		position: fixed;
+		top: auto;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		width: auto;
+		border: 0;
+		border-radius: 18px 18px 0 0;
+		box-shadow: 0 -10px 40px -14px rgba( 0, 0, 0, .45 );
+	}
+
+	.afk-cloche-liste { max-height: 62vh; }
+}
+
+/* -------------------------------------------------------------------------
+ * Journal de diagnostic
+ *
+ * ⚠️ Volontairement au-dessus de tout, y compris des messages flottants :
+ * on l'ouvre precisement pour lire ce qui se passe quand quelque chose ne
+ * va pas, et ce qui ne va pas occupe souvent le bas de l'ecran.
+ *
+ * Il ne parait que sur demande — `?afk_debug=1` — et n'est donc jamais vu
+ * par un visiteur ordinaire.
+ * ---------------------------------------------------------------------- */
+
+.afk-journal {
+	position: fixed;
+	inset: 8px 8px auto;
+	z-index: 2147483000;
+	display: flex;
+	flex-direction: column;
+	max-height: 70vh;
+	border: 2px solid #0f4d73;
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: 0 10px 40px rgba( 0, 0, 0, .35 );
+	color: #12303f;
+	font: 12px/1.4 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+.afk-journal[hidden] { display: none; }
+
+.afk-journal-tete {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 10px;
+	border-bottom: 1px solid rgba( 15, 77, 115, .18 );
+	background: #f2f6f9;
+	border-radius: 10px 10px 0 0;
+}
+
+.afk-journal-compte { margin-right: auto; opacity: .7; }
+
+.afk-journal-bouton {
+	/* 32 px : plus petit qu'une cible tactile ordinaire, et c'est assume —
+	   ce panneau sert au diagnostic, pas au depot. Il doit tenir sur un
+	   telephone sans manger l'ecran qu'on observe. */
+	min-height: 32px;
+	padding: 5px 10px;
+	border: 1px solid #0f4d73;
+	border-radius: 999px;
+	background: #fff;
+	color: #0f4d73;
+	font: inherit;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.afk-journal-corps {
+	/* `pre` garde les retours a la ligne du journal ; `pre-wrap` evite
+	   qu'une ligne longue — une adresse, un agent utilisateur — force un
+	   defilement horizontal sur toute la boite. */
+	margin: 0;
+	padding: 10px;
+	overflow: auto;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	-webkit-overflow-scrolling: touch;
+	/* La selection doit rester possible : c'est le repli quand le
+	   presse-papiers est refuse. */
+	-webkit-user-select: text;
+	user-select: text;
+}
+
+.afk-journal-poignee {
+	position: fixed;
+	right: 8px;
+	top: 50%;
+	z-index: 2147482999;
+	width: 38px;
+	height: 38px;
+	padding: 0;
+	border: 1px solid rgba( 15, 77, 115, .3 );
+	border-radius: 50%;
+	background: rgba( 255, 255, 255, .92 );
+	font-size: 18px;
+	line-height: 36px;
+	text-align: center;
+	cursor: pointer;
+}

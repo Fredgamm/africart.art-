@@ -1,0 +1,30 @@
+# Dépôt africart.art : seul le code maison est versionné et déployé.
+# Principe : on ignore tout, puis on réautorise les dossiers voulus.
+# Le cœur WordPress, wp-config.php, uploads, Voxel et les extensions du commerce restent hors Git.
+
+/*
+!/.gitignore
+!/.gitattributes
+!/.github/
+!/README.md
+
+!/wp-content/
+/wp-content/*
+
+!/wp-content/themes/
+/wp-content/themes/*
+!/wp-content/themes/voxel-child/
+
+!/wp-content/plugins/
+/wp-content/plugins/*
+!/wp-content/plugins/africart-accueil/
+!/wp-content/plugins/africart-pwa/
+
+# Fichiers système et sauvegardes
+.DS_Store
+Thumbs.db
+*.bak-*
+*.log
+.env
+.env.*
+node_modules/

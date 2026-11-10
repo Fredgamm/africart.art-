@@ -1,0 +1,255 @@
+/* AFRICART – Page d'accueil. Tout est préfixé .afk-acc pour ne rien toucher ailleurs. */
+
+.afk-acc {
+	--afk-acc-primary: #011638;
+	--afk-acc-accent: #C9A24E;
+	--afk-acc-ink: #18222E;
+	--afk-acc-muted: #5B6673;
+	--afk-acc-body: #3A4654;
+	--afk-acc-rule: #D9D2C6;
+	--afk-acc-paper: #F3F0EA;
+	--afk-acc-bubble: 5px;
+	font-family: 'BrutGrotesque', Helvetica, Arial, sans-serif;
+	color: var(--afk-acc-ink);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	/* Pleine largeur, même dans un conteneur Elementor « boxed » (--afk-acc-sbw = largeur de la barre de défilement, posée en JS). */
+	width: calc(100vw - var(--afk-acc-sbw, 0px));
+	max-width: none;
+	margin-left: calc(50% - (100vw - var(--afk-acc-sbw, 0px)) / 2);
+	margin-right: 0;
+	box-sizing: border-box;
+}
+/* Supprime l'espacement et les marges qu'Elementor met autour de nos widgets, sans toucher aux autres conteneurs. */
+.e-con:has(> .elementor-widget-shortcode .afk-acc),
+.e-con:has(> .e-con-inner > .elementor-widget-shortcode .afk-acc) { --gap: 0px; --row-gap: 0px; --column-gap: 0px; --padding-top: 0px; --padding-bottom: 0px; --padding-left: 0px; --padding-right: 0px; overflow: visible; }
+.elementor-widget-shortcode:has(.afk-acc) { margin: 0 !important; }
+.elementor-widget-shortcode:has(.afk-acc) > .elementor-widget-container,
+.elementor-widget-shortcode:has(.afk-acc) .elementor-shortcode { margin: 0; padding: 0; }
+.afk-acc *, .afk-acc *::before, .afk-acc *::after { box-sizing: border-box; }
+.afk-acc :where(h1, h2, h3, p, ol, li, figure, figcaption) { padding: 0; }
+/* Specificite (0,2,1) : passe devant les styles globaux du kit Elementor (.elementor-kit-X h1, p, a...). */
+.afk-acc.afk-acc :is(h1, h2, h3, h4, p, ol, li, figure, figcaption) { margin: 0; }
+.afk-acc.afk-acc :is(h1, h2, h3, h4, p, a, li, span, strong, input, button, figcaption, label) { font-family: inherit; text-transform: none; }
+.afk-acc.afk-acc :where(p, li, figcaption) { color: inherit; } /* (0,2,0) : bat le kit, laisse gagner nos classes declarees ensuite */
+.afk-acc :where(ol) { list-style: none; }
+.afk-acc :where(img) { max-width: 100%; height: auto; display: block; }
+.afk-acc :where(a) { color: inherit; }
+.afk-acc .afk-acc-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.afk-acc .afk-acc-section { max-width: none; margin: 0; padding-left: clamp(16px, 4.5vw, 88px); padding-right: clamp(16px, 4.5vw, 88px); }
+
+.afk-acc .afk-acc-link { color: var(--afk-acc-primary); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.afk-acc .afk-acc-link:hover { text-decoration-thickness: 2px; }
+
+.afk-acc .afk-acc-h1 {
+	font-weight: 700;
+	font-size: clamp(38px, 5.4vw, 88px);
+	line-height: 0.95;
+	letter-spacing: -0.025em;
+	color: var(--afk-acc-primary);
+	max-width: 1200px;
+}
+.afk-acc .afk-acc-h2 { font-weight: 700; font-size: clamp(36px, 3.8vw, 52px); line-height: 1; letter-spacing: -0.02em; color: var(--afk-acc-primary); }
+.afk-acc .afk-acc-h2-sm { font-size: clamp(30px, 2.8vw, 40px); line-height: 1.05; }
+
+/* ---------- Bulle (reprend la bulle du logo) ----------
+   Le contour est fait de barres pleines (aucun cache blanc posé par-dessus un bord, source de
+   liserés sur les écrans à densité fractionnaire). Le bas est en deux morceaux, la queue est un
+   SVG dont le départ chevauche la barre de gauche : raccord net, angle à onglet comme sur le logo.
+   Le fond blanc s'arrête au-dessus de la barre basse, pour que la trouée laisse voir le fond de section. */
+.afk-acc .afk-acc-bulle {
+	--afk-acc-tail-x: 58%;
+	--afk-acc-tail-safe: 0px;
+	position: relative; isolation: isolate; border: 0 !important; background: transparent; padding: var(--afk-acc-bubble);
+}
+.afk-acc .afk-acc-bulle-frame { position: absolute; inset: 0; pointer-events: none; z-index: 3;
+	--afk-acc-tx: min(var(--afk-acc-tail-x), calc(100% - var(--afk-acc-tail-safe) - 78px)); }
+.afk-acc .afk-acc-bulle-bg { position: absolute; inset: 0 0 var(--afk-acc-bubble) 0; background: #fff; z-index: -1; pointer-events: none; transition: background-color .2s; }
+.afk-acc .afk-acc-bulle-frame > i { position: absolute; display: block; background: var(--afk-acc-primary); }
+.afk-acc .afk-acc-bulle-frame > .t { top: 0; left: 0; right: 0; height: var(--afk-acc-bubble); }
+.afk-acc .afk-acc-bulle-frame > .l { top: 0; bottom: 0; left: 0; width: var(--afk-acc-bubble); }
+.afk-acc .afk-acc-bulle-frame > .r { top: 0; bottom: 0; right: 0; width: var(--afk-acc-bubble); }
+.afk-acc .afk-acc-bulle-frame > .bl { bottom: 0; left: 0; width: var(--afk-acc-tx); height: var(--afk-acc-bubble); }
+.afk-acc .afk-acc-bulle-frame > .br { bottom: 0; right: 0; left: calc(var(--afk-acc-tx) + 78px); height: var(--afk-acc-bubble); }
+.afk-acc .afk-acc-bulle-frame > .q {
+	position: absolute; left: calc(var(--afk-acc-tx) - 10px); top: calc(100% - var(--afk-acc-bubble)); width: 74px; height: 44px;
+	color: var(--afk-acc-primary); background: none;
+}
+.afk-acc .afk-acc-bulle-frame > .q svg { display: block; width: 74px; height: 44px; overflow: visible; }
+/* Le thème remplit les <path> des SVG (fill), ce qui ajoutait un triangle noir sous la queue :
+   nos icônes sont des traits, on force donc fill: none sur tous nos SVG. */
+.afk-acc.afk-acc svg path, .afk-acc.afk-acc svg circle { fill: none !important; stroke: currentColor !important; }
+.afk-acc.afk-acc .afk-acc-bulle-frame > .q svg path { stroke-width: 5px !important; stroke-linejoin: miter !important; stroke-linecap: butt !important; }
+.afk-acc.afk-acc .afk-acc-search-btn svg path { stroke-width: 2.2px !important; }
+.afk-acc.afk-acc .afk-acc-sugg-avatar svg path, .afk-acc.afk-acc .afk-acc-sugg-avatar svg circle { stroke-width: 2px !important; }
+
+/* ---------- [afk_hero] ---------- */
+.afk-acc .afk-acc-hero-in { padding-top: 72px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 56px; }
+.afk-acc .afk-acc-hero-row { display: flex; gap: 64px; align-items: flex-start; flex-wrap: wrap; }
+.afk-acc .afk-acc-search { position: relative; flex: 2 1 560px; min-width: 0; z-index: 20; }
+.afk-acc .afk-acc-search .afk-acc-bulle { display: flex; align-items: stretch; margin: 0; }
+.afk-acc .afk-acc-search-input {
+	flex: 1 1 auto; min-width: 0; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important;
+	padding: 0 24px !important; min-height: 80px; margin: 0;
+	font-family: inherit !important; font-size: 26px !important; font-weight: 500; color: var(--afk-acc-primary) !important; outline: none;
+	-webkit-appearance: none; appearance: none;
+}
+.afk-acc .afk-acc-search-input::placeholder { color: #8A93A0; opacity: 1; }
+.afk-acc .afk-acc-search-input::-webkit-search-cancel-button { -webkit-appearance: none; }
+.afk-acc .afk-acc-search .afk-acc-bulle { --afk-acc-tail-safe: 80px; }
+/* Focus discret : pas de cadre autour de la bulle, un fond légèrement teinté. */
+.afk-acc .afk-acc-search .afk-acc-bulle:focus-within .afk-acc-bulle-bg { background: #FAF8F4; }
+.afk-acc .afk-acc-search .afk-acc-search-input:focus,
+.afk-acc .afk-acc-search .afk-acc-search-input:focus-visible { outline: none !important; box-shadow: none !important; }
+.afk-acc .afk-acc-search .afk-acc-search-btn:focus-visible { outline: 3px solid var(--afk-acc-accent); outline-offset: -6px; }
+.afk-acc .afk-acc-search-btn {
+	color: #fff !important;
+	width: 80px; flex: 0 0 80px; border: 0 !important; border-radius: 0 !important; background: var(--afk-acc-primary) !important; cursor: pointer;
+	display: flex; align-items: center; justify-content: center; padding: 0 !important;
+	/* Le bouton passe sous le cadre : il touche les barres haut, droite et bas, sans liseré. */
+	margin: calc(-1 * var(--afk-acc-bubble)) calc(-1 * var(--afk-acc-bubble)) calc(-1 * var(--afk-acc-bubble)) 0 !important;
+}
+.afk-acc .afk-acc-search-btn:hover { filter: brightness(1.25); }
+.afk-acc .afk-acc-hero-text { flex: 1 1 300px; padding-top: 6px; font-size: 18px; line-height: 1.55; color: var(--afk-acc-body); }
+.afk-acc .afk-acc-hero-text strong { color: var(--afk-acc-primary); font-weight: 700; }
+
+/* Suggestions */
+.afk-acc .afk-acc-sugg {
+	position: absolute; left: 0; right: 0; top: 100%; margin-top: 52px;
+	background: #fff; border: 1px solid var(--afk-acc-rule); box-shadow: 0 16px 40px rgba(1, 22, 56, .16);
+	display: flex; flex-direction: column; max-height: 70vh; overflow: auto;
+}
+.afk-acc .afk-acc-sugg[hidden] { display: none; }
+.afk-acc .afk-acc-sugg-item { display: flex; align-items: center; gap: 14px; padding: 8px 20px; text-decoration: none !important; color: var(--afk-acc-ink); }
+.afk-acc .afk-acc-sugg-item.is-artist { padding: 12px 20px; border-bottom: 1px solid #EEE8DE; }
+.afk-acc .afk-acc-sugg-item:hover, .afk-acc .afk-acc-sugg-item.is-focus { background: #F6F3EE; }
+.afk-acc .afk-acc-sugg-avatar.is-country { background: var(--afk-acc-paper); color: var(--afk-acc-primary); }
+.afk-acc .afk-acc-sugg-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--afk-acc-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex: 0 0 36px; }
+.afk-acc .afk-acc-sugg-thumb { width: 36px; height: 36px; object-fit: cover; flex: 0 0 36px; background: #E9E3D8; }
+.afk-acc .afk-acc-sugg-name { font-weight: 700; font-size: 17px; color: var(--afk-acc-primary); }
+.afk-acc .afk-acc-sugg-title { font-weight: 600; font-size: 16px; }
+.afk-acc .afk-acc-sugg-meta { font-size: 14px; color: var(--afk-acc-muted); }
+.afk-acc .afk-acc-sugg-msg { padding: 16px 20px; font-size: 15px; color: var(--afk-acc-muted); }
+.afk-acc .afk-acc-sugg-all { padding: 12px 20px; border-top: 1px solid #EEE8DE; font-size: 14px; font-weight: 600; text-decoration: none !important; color: var(--afk-acc-primary); }
+.afk-acc .afk-acc-sugg-all:hover, .afk-acc .afk-acc-sugg-all.is-focus { background: #F6F3EE; }
+
+/* ---------- [afk_mur] ---------- */
+.afk-acc .afk-acc-wall { display: flex; gap: 10px; height: clamp(300px, 25vw, 460px); padding: 24px 10px 0; overflow: hidden; }
+.afk-acc .afk-acc-wall-item { position: relative; flex: 1 1 0; min-width: 0; display: block; background: #2F4A5E; text-decoration: none !important; overflow: hidden; }
+.afk-acc .afk-acc-wall-img { position: absolute; inset: 0; width: 100% !important; height: 100% !important; max-width: none !important; object-fit: cover; transition: transform .6s ease; }
+.afk-acc .afk-acc-wall-item:hover .afk-acc-wall-img { transform: scale(1.04); }
+.afk-acc .afk-acc-wall-cap {
+	position: absolute; left: 0; right: 0; bottom: 0; padding: 28px 16px 14px; display: flex; justify-content: space-between; gap: 8px;
+	color: #fff; font-size: 13px; background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.65));
+}
+.afk-acc .afk-acc-wall-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.afk-acc .afk-acc-wall-artist { opacity: .8; white-space: nowrap; }
+
+/* ---------- [afk_index] ---------- */
+.afk-acc .afk-acc-index-in { padding-top: 120px; padding-bottom: 96px; display: flex; gap: 64px; align-items: flex-start; }
+.afk-acc .afk-acc-index-list { flex: 1 1 560px; min-width: 0; display: flex; flex-direction: column; }
+.afk-acc .afk-acc-index-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 28px; }
+.afk-acc .afk-acc-index-head .afk-acc-link { white-space: nowrap; padding-bottom: 6px; }
+.afk-acc .afk-acc-index-head .afk-acc-h2 { max-width: 10.5em; }
+.afk-acc .afk-acc-row {
+	display: grid; grid-template-columns: 56px minmax(0, 1fr) 180px 32px; align-items: baseline; gap: 16px;
+	padding: 18px 0; border-top: 1px solid var(--afk-acc-rule); text-decoration: none !important; color: var(--afk-acc-ink);
+}
+.afk-acc .afk-acc-row-thumb { display: none !important; }
+.afk-acc .afk-acc-row-num { font-size: 14px; font-weight: 600; color: #8A93A0; }
+.afk-acc .afk-acc-row-title { font-size: 26px; font-weight: 500; letter-spacing: -.01em; }
+.afk-acc .afk-acc-row-artist { font-size: 15px; color: var(--afk-acc-muted); }
+.afk-acc .afk-acc-row-arrow { font-size: 20px; opacity: 0; transition: opacity .2s, transform .2s; }
+.afk-acc .afk-acc-row.is-active, .afk-acc .afk-acc-row:hover, .afk-acc .afk-acc-row:focus-visible { color: var(--afk-acc-primary); border-top-color: var(--afk-acc-primary); }
+.afk-acc .afk-acc-row.is-active .afk-acc-row-title { font-weight: 700; }
+.afk-acc .afk-acc-row.is-active .afk-acc-row-arrow { opacity: 1; transform: translateX(4px); }
+.afk-acc .afk-acc-rows li:last-child .afk-acc-row { border-bottom: 1px solid var(--afk-acc-rule); }
+.afk-acc .afk-acc-index-note { padding-top: 24px; font-size: 16px; color: var(--afk-acc-body); }
+.afk-acc .afk-acc-index-preview { flex: 1 1 380px; max-width: 640px; min-width: 0; position: sticky; top: 100px; display: flex; flex-direction: column; gap: 14px; }
+.afk-acc .afk-acc-preview-img { width: 100% !important; aspect-ratio: 4 / 5; object-fit: cover; background: #E9E3D8; transition: opacity .25s; }
+.afk-acc .afk-acc-index-preview.is-loading .afk-acc-preview-img { opacity: .4; }
+.afk-acc .afk-acc-index-preview figcaption { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
+.afk-acc .afk-acc-preview-title { font-weight: 700; color: var(--afk-acc-primary); }
+.afk-acc .afk-acc-preview-artist { color: var(--afk-acc-muted); }
+
+/* ---------- [afk_referencer] ---------- */
+.afk-acc.afk-acc-referencer { background: var(--afk-acc-primary); color: #fff; }
+.afk-acc .afk-acc-ref-in { padding-top: 112px; padding-bottom: 112px; display: flex; flex-direction: column; gap: 56px; }
+.afk-acc .afk-acc-ref-title { color: #fff; font-weight: 700; font-size: clamp(36px, 5.2vw, 76px); line-height: 1.02; letter-spacing: -.02em; max-width: 1100px; }
+.afk-acc .afk-acc-ref-title span { color: var(--afk-acc-accent); }
+.afk-acc .afk-acc-steps { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; font-size: 20px; font-weight: 500; }
+.afk-acc .afk-acc-steps-line { flex: 1 1 40px; height: 2px; background: rgba(255,255,255,.35); }
+.afk-acc .afk-acc-ref-actions { display: flex; align-items: center; gap: 32px; flex-wrap: wrap; }
+.afk-acc .afk-acc-btn-accent {
+	display: inline-flex; align-items: center; min-height: 56px; padding: 0 30px; background: var(--afk-acc-accent);
+	color: var(--afk-acc-primary) !important; font-weight: 700; font-size: 17px; text-decoration: none !important;
+}
+.afk-acc .afk-acc-btn-accent:hover { filter: brightness(1.08); }
+.afk-acc .afk-acc-link-light { color: #fff !important; font-weight: 600; text-underline-offset: 3px; }
+.afk-acc .afk-acc-ref-text { font-size: 16px; line-height: 1.6; color: #C9D2DC; max-width: 720px; }
+
+/* ---------- [afk_page_artiste] ---------- */
+.afk-acc.afk-acc-artiste { background: var(--afk-acc-paper); }
+.afk-acc .afk-acc-artiste-in { padding-top: 104px; padding-bottom: 120px; display: flex; gap: 64px; align-items: center; flex-wrap: wrap; }
+.afk-acc .afk-acc-artiste-text { flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.afk-acc .afk-acc-artiste-text p { font-size: 17px; line-height: 1.6; color: var(--afk-acc-body); }
+.afk-acc .afk-acc-bulle-url {
+	flex: 1.4 1 520px; min-width: 0; padding: 36px 40px; font-weight: 700; font-size: clamp(24px, 3.6vw, 52px);
+	letter-spacing: -.02em; color: var(--afk-acc-primary); overflow-wrap: anywhere;
+}
+.afk-acc .afk-acc-bulle-url { --afk-acc-tail-x: 22%; }
+.afk-acc .afk-acc-bulle-url .afk-acc-url-slug { color: #8A6A1F; }
+
+/* ---------- [afk_apropos] ---------- */
+.afk-acc .afk-acc-apropos-in { padding-top: 104px; padding-bottom: 104px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 48px; }
+.afk-acc .afk-acc-col { border-top: 5px solid var(--afk-acc-primary); padding-top: 24px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.afk-acc .afk-acc-col h3 { line-height: 1.2; letter-spacing: 0; font-size: 22px; font-weight: 700; color: var(--afk-acc-primary); }
+.afk-acc .afk-acc-col p { font-size: 16px; line-height: 1.6; color: var(--afk-acc-body); }
+
+/* ---------- Tablette ---------- */
+@media (max-width: 1023px) {
+	.afk-acc .afk-acc-index-in { flex-direction: column; padding-top: 80px; padding-bottom: 72px; }
+	.afk-acc .afk-acc-index-preview { display: none; }
+	.afk-acc .afk-acc-index-list { flex-basis: auto; width: 100%; }
+	.afk-acc .afk-acc-row { grid-template-columns: 56px minmax(0, 1fr) 140px; }
+	.afk-acc .afk-acc-row-arrow { display: none; }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 767px) {
+	.afk-acc .afk-acc-section { padding-left: 16px; padding-right: 16px; }
+	.afk-acc .afk-acc-hero-in { padding-top: 40px; padding-bottom: 48px; gap: 32px; }
+	.afk-acc .afk-acc-hero-row { gap: 40px; }
+	.afk-acc .afk-acc-search { flex-basis: 100%; }
+	.afk-acc .afk-acc-search-input { font-size: 17px !important; min-height: 56px; padding: 0 14px !important; }
+	.afk-acc .afk-acc-search .afk-acc-bulle { --afk-acc-tail-x: 34%; --afk-acc-tail-safe: 56px; }
+	.afk-acc .afk-acc-h1 { font-size: clamp(30px, 8.4vw, 40px); line-height: 1.02; letter-spacing: -0.02em; }
+	.afk-acc .afk-acc-search-btn { width: 56px; flex-basis: 56px; }
+	.afk-acc .afk-acc-search-btn svg { width: 22px; height: 22px; }
+	.afk-acc .afk-acc-sugg { margin-top: 44px; }
+	.afk-acc .afk-acc-hero-text { font-size: 16px; line-height: 1.5; }
+
+	.afk-acc .afk-acc-wall { height: 260px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 16px 16px 0; -webkit-overflow-scrolling: touch; }
+	.afk-acc .afk-acc-wall-item { flex: 0 0 auto !important; width: 70vw; scroll-snap-align: start; }
+
+	.afk-acc .afk-acc-index-in { padding-top: 56px; padding-bottom: 56px; }
+	.afk-acc .afk-acc-row { grid-template-columns: 56px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 14px; row-gap: 2px; align-items: center; padding: 12px 0; }
+	.afk-acc .afk-acc-row-num { display: none; }
+	.afk-acc .afk-acc-row-thumb { display: block !important; grid-row: 1 / 3; width: 56px; height: 56px; object-fit: cover; }
+	.afk-acc .afk-acc-row-title { font-size: 19px; }
+	.afk-acc .afk-acc-row-artist { font-size: 14px; }
+
+	.afk-acc .afk-acc-ref-in { padding-top: 64px; padding-bottom: 64px; gap: 36px; }
+	.afk-acc .afk-acc-steps { flex-direction: column; align-items: flex-start; gap: 10px; font-size: 18px; }
+	.afk-acc .afk-acc-steps li:not(.afk-acc-steps-line)::before { content: "→ "; color: var(--afk-acc-accent); }
+	.afk-acc .afk-acc-steps-line { display: none; }
+
+	.afk-acc .afk-acc-artiste-in { padding-top: 64px; padding-bottom: 80px; gap: 32px; }
+	.afk-acc .afk-acc-bulle-url { padding: 22px 20px; }
+	.afk-acc .afk-acc-apropos-in { padding-top: 64px; padding-bottom: 64px; gap: 36px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.afk-acc .afk-acc-wall-img, .afk-acc .afk-acc-row-arrow, .afk-acc .afk-acc-preview-img { transition: none; }
+}

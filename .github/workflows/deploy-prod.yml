@@ -1,0 +1,48 @@
+# Déploiement automatique vers la prod o2switch (arancia.o2switch.net) par FTPS.
+# Se lance à chaque push sur main (donc à chaque fusion d'une PR), ou à la main depuis l'onglet Actions.
+# N'envoie que les fichiers modifiés du dépôt : voxel-child, africart-accueil, africart-pwa.
+# Ne supprime rien sur le serveur qui ne vienne pas du dépôt.
+#
+# Secrets à créer dans GitHub (Settings > Secrets and variables > Actions) :
+#   FTP_USERNAME     compte FTP (idéalement un compte dédié limité au site)
+#   FTP_PASSWORD     mot de passe de ce compte
+#   FTP_WP_CONTENT   chemin du dossier wp-content vu par ce compte FTP, terminé par /
+#                    ex. /africart.art/wp-content/  ou  /public_html/wp-content/
+
+name: Déploiement prod
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Vérifier la syntaxe PHP
+        run: |
+          find wp-content -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: Envoyer sur o2switch (FTPS)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: arancia.o2switch.net
+          port: 21
+          protocol: ftps
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./wp-content/
+          server-dir: ${{ secrets.FTP_WP_CONTENT }}
+          state-name: .ftp-deploy-sync-state.json
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**

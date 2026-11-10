@@ -1,0 +1,199 @@
+{
+  "_format": 1,
+  "_lisez_moi": "Valeurs d'usine du plugin. Voir README.md dans ce dossier avant de modifier.",
+  "identite": {
+    "app_name": "AFRICART",
+    "short_name": "AFRICART",
+    "description": "Répertoire universel des œuvres réalisées par des artistes africain·e·s.",
+    "lang": "fr",
+    "languages": "fr, en, es"
+  },
+  "apparence": {
+    "theme_color": "#0F4D73",
+    "background_color": "#0F4D73",
+    "accent_color": "#D9BA61",
+    "display": "standalone",
+    "_note_barre_ios": "Barre d'etat iOS. « black-translucent » fait passer le contenu SOUS l'heure et la batterie — constate sur iPhone, le haut de la page s'y cachait. « default » reserve la place de la barre : c'est le choix sur pour un site qui n'a pas ete concu bord a bord.",
+    "ios_status_bar": "default",
+    "orientation": "portrait-primary",
+    "_note_start_url": "URL de démarrage PROPRE, sans paramètre de suivi : mesuré en production, tout paramètre (utm_*, fbclid) fait contourner le cache de bordure — chaque lancement de l'app paierait 1 à 2 s au lieu de 70 ms. Les lancements se comptent en JavaScript (événement pwa_launch envoyé à Google Analytics via Site Kit), pas par l'URL.",
+    "start_url": "{{home_url}}",
+    "categories": "art, education, lifestyle"
+  },
+  "icones": {
+    "icon_192": "{{plugin_url}}assets/icons/icon-192.png",
+    "icon_512": "{{plugin_url}}assets/icons/icon-512.png",
+    "icon_maskable": "{{plugin_url}}assets/icons/icon-maskable-512.png",
+    "apple_touch_icon": "{{plugin_url}}assets/icons/apple-touch-icon-180.png"
+  },
+  "captures": {
+    "screenshot_wide": "{{plugin_url}}assets/screenshots/screenshot-wide.png",
+    "screenshot_wide_w": 1896,
+    "screenshot_wide_h": 724,
+    "screenshot_mobile": "{{plugin_url}}assets/screenshots/screenshot-mobile.jpeg",
+    "screenshot_mobile_w": 792,
+    "screenshot_mobile_h": 1280
+  },
+  "raccourci": {
+    "shortcut_name": "Œuvres",
+    "shortcut_url": "{{home_url}}oeuvres/",
+    "shortcut_icon": "{{plugin_url}}assets/icons/icon-96.png"
+  },
+  "installation": {
+    "banner_enabled": "1",
+    "banner_position": "bottom",
+    "banner_delay": 3,
+    "banner_dismiss_days": 7,
+    "banner_ios": "1",
+    "banner_inapp": "1",
+    "_note_gif": "Le GIF fourni montre le geste iOS (Partager → Sur l'écran d'accueil). Android ouvre une vraie fenêtre d'installation et n'a rien à montrer ; dans les navigateurs Instagram/Facebook l'installation est impossible, le message invite à ouvrir ailleurs. Un champ vide affiche l'icône de l'application : c'est le comportement voulu, pas une valeur oubliée.",
+    "install_gif_android": "",
+    "install_gif_ios": "{{plugin_url}}assets/img/step-pwa.gif",
+    "install_gif_inapp": "",
+    "banner_gif_height": 374,
+    "install_title": "Installer AFRICART",
+    "install_message": "Ajoutez l’app à votre écran d’accueil : plus rapide, et disponible hors connexion.",
+    "install_button": "Installer",
+    "install_ios": "Touchez le bouton Partager, puis « Sur l’écran d’accueil ».",
+    "install_inapp": "Ouvrez cette page dans votre navigateur pour installer l’application.",
+    "_note_samsung": "Samsung Internet fabrique lui-même le paquet d'installation et Play Protect ne le reconnaît pas : un avertissement s'affiche à tort (problème connu du navigateur, constaté aussi ailleurs — Progressier redirige vers Chrome depuis mars 2026). Cette note rassure le visiteur pour qu'il n'abandonne pas.",
+    "install_samsung": "Samsung peut afficher un avertissement Play Protect : choisissez « Installer quand même ». L’application est simplement le site AFRICART."
+  },
+  "performance": {
+    "perf_conversion": "1",
+    "perf_rewrite": "1",
+    "perf_avif": "1",
+    "perf_webp": "1",
+    "perf_avif_quality": 55,
+    "perf_webp_quality": 82,
+    "perf_fonts": "1",
+    "_note_lazy": "Les œuvres sont des fonds CSS : loading=lazy ne s'y applique pas et le navigateur télécharge tous les fonds, même hors écran (mesuré : 20 images / 1,5 Mo à l'arrivée sur l'accueil). Le report ne s'applique qu'au-delà des premiers fonds, pour ne pas retarder ce qui est visible dès l'arrivée.",
+    "perf_lazy": "1",
+    "perf_lazy_eager": 4,
+    "_note_delay": "Scripts tiers différés au premier geste (mesuré : 63 % du JS jamais exécuté, tiers en tête). gtag met ses événements en file dans dataLayer ; OneSignal passe par la file OneSignalDeferred ; un visiteur déjà traduit (cookie googtrans) est servi immédiatement. Un fragment d'adresse par ligne.",
+    "perf_delay": "1",
+    "perf_delay_timeout": 6,
+    "perf_delay_urls": "googletagmanager.com/gtag/js\ntranslate.googleapis.com\ntranslate.google.com\ncdn.onesignal.com/sdks/web/v16/OneSignalSDK.page",
+    "_note_bandeau": "Fonds du bandeau d'accueil, dans les feuilles CSS d'Elementor. Chaque entrée couvre TOUTES les cibles d'Elementor — élément de base, couche motion-effects, et leurs ::before : c'est l'oubli des ::before qui faisait télécharger les deux formats lors de la première tentative. #banner-image-home est l'identifiant posé dans Elementor (Avancé → Identifiant CSS) ; un sélecteur sans correspondance est simplement sans effet.",
+    "perf_css_backgrounds": [
+      {
+        "selector": "#banner-image-home:not(.elementor-motion-effects-element-type-background), #banner-image-home > .elementor-motion-effects-container > .elementor-motion-effects-layer, #banner-image-home::before, #banner-image-home > .elementor-motion-effects-container > .elementor-motion-effects-layer::before",
+        "image": "{{home_url}}wp-content/uploads/2025/04/Anapa-Sans-titre-1997-acrylique-sur-bois-et-carton-50-x-60-cm-web.jpg"
+      },
+      {
+        "selector": ".elementor-125 .elementor-element.elementor-element-72e2d01:not(.elementor-motion-effects-element-type-background), .elementor-125 .elementor-element.elementor-element-72e2d01 > .elementor-motion-effects-container > .elementor-motion-effects-layer",
+        "image": "{{home_url}}wp-content/uploads/2025/04/Anapa-Sans-titre-1997-acrylique-sur-bois-et-carton-50-x-60-cm.jpg"
+      },
+      {
+        "selector": ".elementor-125 .elementor-element.elementor-element-72e2d01::before, .elementor-125 .elementor-element.elementor-element-72e2d01 > .elementor-motion-effects-container > .elementor-motion-effects-layer::before",
+        "image": "{{home_url}}wp-content/uploads/2025/04/Anapa-Sans-titre-1997-acrylique-sur-bois-et-carton-50-x-60-cm-web.jpg"
+      }
+    ]
+  },
+  "notifications": {
+    "_note_identifiants": "os_app_id et os_safari_id sont propres au compte OneSignal : ils ne peuvent pas avoir de valeur d'usine. os_enabled vaut 1, mais les notifications ne démarrent qu'une fois l'identifiant saisi — coller l'identifiant suffit donc, sans autre manipulation.",
+    "os_enabled": "1",
+    "os_app_id": "",
+    "os_safari_id": "",
+    "_note_popup": "Fenetre d'invitation propre au plugin : OneSignal propose les siennes, mais elles s'habillent mal et imposent leur moment. Les centres d'interet y sont replies : un visiteur qui accepte sans les deplier recoit tout, et le script lui affecte alors toutes les etiquettes — sans quoi un envoi cible plus tard ne l'atteindrait jamais.",
+    "os_popup": "1",
+    "_note_popup_ou": "Uniquement dans l'application installee. Deux raisons : ne pas ajouter une fenetre de plus a un navigateur qui en voit deja beaucoup, et ne solliciter que des visiteurs deja engages — qui ont fait la demarche d'installer. Sur iPhone c'est de toute facon le seul contexte ou les notifications web existent. « both » ou « browser » restent disponibles pour qui veut elargir.",
+    "os_popup_context": "pwa",
+    "_note_cloche": "Cloche flottante, visible des seuls abonnes : elle rouvre la fenetre en mode gestion — centres d'interet et desabonnement. C'est le SEUL endroit d'ou l'on peut retirer son consentement sans dependre d'une page, le modele du theme n'affichant pas toujours le contenu. La desactiver prive donc le visiteur de ce recours : a ne faire que si un autre chemin existe.",
+    "os_bell": "1",
+    "os_popup_delay": 25,
+    "os_popup_days": 30,
+    "_note_rgpd": "Le lien de confidentialite precede le consentement, jamais l'inverse : le visiteur doit savoir a quoi il consent avant d'accepter. privacy_url vide reprend la page declaree dans Reglages > Confidentialite ; sans page declaree aucun lien n'est affiche, un lien mort valant moins que pas de lien.",
+    "privacy_url": "",
+    "push_privacy": "Comment nous traitons vos données",
+    "push_unsub": "Me désabonner",
+    "push_manage": "Vos notifications",
+    "push_title": "Restez informé",
+    "push_choose": "Choisir ce que je reçois",
+    "push_prompt": "Soyez informé des nouvelles œuvres référencées.",
+    "push_accept": "M’abonner",
+    "push_refuse": "Plus tard",
+    "os_categories": [
+      {
+        "slug": "oeuvres",
+        "label": "Nouvelles œuvres"
+      },
+      {
+        "slug": "artistes",
+        "label": "Artistes"
+      }
+    ],
+    "_note_triggers": "Le centre d'intérêt est laissé vide : la notification part alors à TOUS les abonnés. Le renseigner ne toucherait que les visiteurs l'ayant explicitement coché sur une page portant [africart_notifications] — or un visiteur qui accepte l'invite native du navigateur n'en coche aucun. Constaté : un envoi cible sur « oeuvres » n'a atteint aucun des 7 abonnes.",
+    "os_triggers": [
+      {
+        "post_type": "oeuvre",
+        "category": "",
+        "title": "Nouvelle œuvre sur AFRICART"
+      },
+      {
+        "post_type": "profile",
+        "category": "",
+        "title": "Nouvel artiste référencé"
+      }
+    ]
+  },
+  "partage": {
+    "seo_enabled": "1",
+    "seo_post_type": "oeuvre"
+  },
+  "hors_ligne": {
+    "sw_enabled": "1",
+    "offline_title": "Vous êtes hors connexion",
+    "offline_message": "Impossible de charger cette page pour le moment. Vérifiez votre connexion — les pages déjà visitées restent accessibles.",
+    "offline_button": "Réessayer"
+  },
+  "statistiques": {
+    "_note": "Le plugin n'envoie rien a Google directement : il annonce des faits dans le dataLayer et laisse le gestionnaire de balises decider. N'activer la pose du conteneur que si aucune autre extension ne le pose deja : deux conteneurs identiques comptent chaque visite deux fois.",
+    "stats_enabled": "1",
+    "stats_gtm_id": "",
+    "stats_ga4_id": "",
+    "stats_inject": "",
+    "stats_consent": "",
+    "_note_consentement": "Le bandeau ne s'affiche que si aucune autre extension de consentement n'est en place. Les deux choix ont le meme poids visuel : un refus plus discret que l'acceptation vicierait le consentement.",
+    "consent_enabled": "",
+    "consent_title": "Mesure d’audience",
+    "consent_text": "Nous mesurons la fréquentation du site pour l’améliorer. Rien n’est collecté sans votre accord.",
+    "consent_accept": "Accepter",
+    "consent_refuse": "Refuser",
+    "consent_days": "180"
+  },
+  "oeuvres": {
+    "_note": "Ces reglages gouvernent le depot depuis l'application, pas le formulaire du site. Vide signifie << suivre le theme >> : un module qui change le comportement du site des son activation serait une mauvaise surprise.",
+    "art_notifs": "1",
+    "art_notifs_email": "",
+    "art_statut_creation": "",
+    "art_suppression": "",
+    "_note_textes": "Les %s sont remplaces : par la date de derniere synchronisation dans les bandeaux, par l'heure dans le message d'enregistrement.",
+    "art_etat_draft": "Brouillon",
+    "art_etat_review": "En attente de validation",
+    "art_etat_published": "En ligne",
+    "art_etat_rejected": "Refusée",
+    "art_etat_unpublished": "Retirée du site",
+    "art_sync_attente": "Envoi en attente",
+    "art_sync_encours": "Envoi en cours",
+    "art_sync_incomplet": "À compléter",
+    "art_sync_conflit": "À départager",
+    "art_sync_erreur": "Envoi impossible",
+    "art_hors_ligne": "Hors connexion — vos œuvres telles qu’enregistrées le %s.",
+    "art_injoignable": "Site momentanément injoignable — vos œuvres telles qu’enregistrées le %s.",
+    "art_vide": "Hors connexion, et aucune œuvre n’a encore été enregistrée sur cet appareil.",
+    "art_form_avis": "Hors connexion — votre saisie est conservée sur cet appareil et partira au retour du réseau.",
+    "art_form_absent": "Hors connexion, et le formulaire n’a pas encore été chargé sur cet appareil. Ouvrez cette page une fois avec du réseau.",
+    "art_form_depot": "Déposer l’œuvre",
+    "art_form_enfile": "En file d’attente",
+    "art_form_partira": "En attente d’envoi — lancez l’envoi quand vous serez prêt.",
+    "art_form_sortie": "Enregistrer et revenir aux œuvres",
+    "art_form_titre_dabord": "Donnez un titre à l’œuvre pour que votre saisie soit conservée.",
+    "art_form_enregistre": "Enregistré le %s",
+    "art_form_encours": "Saisie en cours…",
+    "art_form_maj": "Enregistrer la modification",
+    "art_form_absente": "Cette œuvre n’est pas enregistrée sur cet appareil. Ouvrez-la une fois avec du réseau.",
+    "art_form_toujours": "",
+    "_note_bascule": "Vide : notre formulaire ne prend la main que sans reseau, celui du theme reste en charge en ligne. A 1 : le notre sert dans les deux cas. N'activer qu'apres avoir retire le widget du theme de la page, sinon les deux formulaires s'afficheraient l'un sous l'autre."
+  }
+}

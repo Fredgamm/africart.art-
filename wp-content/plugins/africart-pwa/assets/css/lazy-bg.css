@@ -1,0 +1,37 @@
+/* AFRICART PWA — squelette de chargement des fonds différés.
+ *
+ * Un élément qui porte encore `data-afk-bg` attend son image : plutôt
+ * qu'un vide, il affiche un fond neutre parcouru d'un reflet — le
+ * visiteur comprend qu'un contenu arrive.
+ *
+ * Aucune classe à poser : l'attribut que le réécrivain ajoute sert de
+ * crochet, et sa disparition — à la restitution de l'image — emporte le
+ * squelette avec elle.
+ *
+ * Les `!important` ne s'appliquent que pendant l'attente : une fois
+ * l'attribut retiré, plus aucune de ces règles ne cible l'élément.
+ */
+
+@keyframes afk-bg-shimmer {
+	from { background-position-x: 200%; }
+	to   { background-position-x: -200%; }
+}
+
+[data-afk-bg] {
+	background-color: #262a3b !important;
+	background-image: linear-gradient(
+		100deg,
+		transparent 40%,
+		rgba(255, 255, 255, .09) 50%,
+		transparent 60%
+	) !important;
+	background-size: 200% 100% !important;
+	background-position: 0 0 !important;
+	animation: afk-bg-shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	[data-afk-bg] {
+		animation: none;
+	}
+}

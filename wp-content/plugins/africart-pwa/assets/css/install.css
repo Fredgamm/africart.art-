@@ -1,0 +1,1060 @@
+/* AFRICART PWA — bandeau d'installation et préférences de notification.
+ *
+ * Ces éléments s'affichent PAR-DESSUS le site : les styles sont donc
+ * volontairement autonomes et ne dépendent d'aucune règle du thème, qui
+ * pourrait changer sans préavis.
+ *
+ * Les couleurs ne sont pas écrites en dur : le JavaScript injecte
+ * --afk-accent et --afk-theme depuis les réglages de l'administration.
+ * Les valeurs présentes ici ne servent que de secours — et portent donc
+ * la charte AFRICART, pas celle du gabarit d'origine : le jour où ce
+ * secours sert, il ne doit pas ramener une palette étrangère au site.
+ *
+ * Sommaire :
+ *   1. Bandeau d'installation (mise en page horizontale par défaut)
+ *   2. Variante avec visuel animé (bascule en carte verticale)
+ *   3. Bouton d'installation posé dans une page
+ *   4. Préférences de notification
+ */
+
+/* ---------- 1. Bandeau d'installation ---------- */
+
+.afk-install-banner {
+	--afk-accent: #D9BA61;
+	--afk-theme: #0F4D73;
+
+	/* ⚠️ L'encre des boutons d'accent, et non plus du blanc en dur.
+	 *
+	 * L'accent est passe a l'or de la charte : du blanc dessus tombe a
+	 * 1,9 pour 1, moins de la moitie du minimum lisible. Le bleu de la
+	 * marque y tient a 5,6. La variable suit le ton du bandeau, si bien
+	 * qu'un accent sombre regle depuis l'administration retrouve du
+	 * blanc en changeant cette seule valeur. */
+	--afk-encre-accent: var(--afk-theme);
+
+	position: fixed;
+	left: 50%;
+	z-index: 99999;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: calc(100% - 24px);
+	max-width: 460px;
+	padding: 12px 14px;
+	border-radius: 14px;
+	background: var(--afk-theme);
+	color: #fff;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, .28);
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	font-size: 14px;
+	line-height: 1.35;
+
+	/* État masqué : le bandeau glisse depuis le bord. */
+	opacity: 0;
+	transition: opacity .25s ease, transform .25s ease;
+}
+
+.afk-install-bottom {
+	bottom: 14px;
+	transform: translate(-50%, 120%);
+}
+
+.afk-install-top {
+	top: 14px;
+	transform: translate(-50%, -120%);
+}
+
+.afk-install-banner.is-visible {
+	opacity: 1;
+	transform: translate(-50%, 0);
+}
+
+.afk-install-icon {
+	flex: 0 0 auto;
+	width: 44px;
+	height: 44px;
+	border-radius: 10px;
+	background: #fff;
+	object-fit: contain;
+}
+
+/* ---------- 2. Variante avec visuel animé ----------
+   Dès qu'un GIF est configuré, le bandeau bascule en carte verticale :
+   le visuel montre le geste à faire, il doit donc être vu en premier et
+   disposer de toute la largeur. */
+.afk-install-banner.has-gif {
+	--afk-gif-height: 200px;
+
+	flex-wrap: wrap;
+	gap: 10px;
+	padding: 12px;
+}
+
+.afk-install-gif {
+	order: 1;
+	flex: 1 1 100%;
+	width: 100%;
+	max-height: var(--afk-gif-height);
+	border-radius: 10px;
+	background: #fff;
+	object-fit: contain;
+}
+
+.afk-install-banner.has-gif .afk-install-body {
+	order: 2;
+	flex: 1 1 100%;
+	text-align: center;
+}
+
+.afk-install-banner.has-gif .afk-install-go {
+	order: 3;
+	width: 100%;
+	padding: 12px 16px;
+}
+
+/* La croix se superpose au visuel plutôt que de décaler la mise en page. */
+.afk-install-banner.has-gif .afk-install-close {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	background: rgba(0, 0, 0, .45);
+	opacity: .9;
+}
+
+.afk-install-body {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.afk-install-title {
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.afk-install-text {
+	opacity: .85;
+	font-size: 13px;
+}
+
+.afk-install-go {
+	flex: 0 0 auto;
+	padding: 9px 16px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--afk-accent);
+	color: var(--afk-encre-accent, #0F4D73);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.afk-install-go:active {
+	transform: scale(.97);
+}
+
+.afk-install-close {
+	flex: 0 0 auto;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: #fff;
+	opacity: .6;
+	font-size: 20px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.afk-install-close:hover {
+	opacity: 1;
+}
+
+/* ---------- 3. Bouton posé dans une page ----------
+   Reste masqué tant que l'installation n'est pas possible : déjà
+   installée, ou navigateur qui ne la propose pas. */
+.afk-install-cta {
+	display: inline-block;
+	padding: 12px 26px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--afk-accent, #D9BA61);
+	color: var(--afk-encre-accent, #0F4D73);
+	font-weight: 600;
+	font-size: 15px;
+	cursor: pointer;
+}
+
+.afk-install-cta[hidden] {
+	display: none;
+}
+
+/* Écrans étroits : la pile verticale évite que le bouton écrase le texte. */
+@media (max-width: 380px) {
+	.afk-install-banner {
+		flex-wrap: wrap;
+	}
+
+	.afk-install-go {
+		width: 100%;
+		order: 3;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.afk-install-banner {
+		transition: none;
+	}
+}
+
+/* ---------- 4. Préférences de notification ----------
+   Le bloc reste masqué tant que le navigateur n'est pas reconnu apte à
+   recevoir des notifications : mieux vaut ne rien montrer qu'un
+   formulaire sans effet. */
+.afk-push {
+	--afk-accent: #D9BA61;
+	/* Voir la note sur `.afk-install-banner` : l'or ne se lit pas sous du
+	   blanc. L'encre suit le ton, pas l'inverse. */
+	--afk-encre-accent: var(--afk-theme, #0F4D73);
+	max-width: 34rem;
+	padding: 1.1rem 1.25rem;
+	border: 1px solid rgba(0, 0, 0, .12);
+	border-radius: 12px;
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.afk-push[hidden] { display: none; }
+
+.afk-push-title { display: block; font-size: 1.05rem; margin-bottom: .3rem; }
+.afk-push-intro { margin: 0 0 .9rem; font-size: .95rem; opacity: .85; }
+
+.afk-push-list {
+	display: flex;
+	flex-direction: column;
+	gap: .5rem;
+	margin-bottom: 1rem;
+}
+
+.afk-push-item {
+	display: flex;
+	align-items: center;
+	gap: .55rem;
+	cursor: pointer;
+	font-size: .95rem;
+}
+
+.afk-push-save {
+	padding: .7rem 1.5rem;
+	border: 0;
+	border-radius: 999px;
+	background: var(--afk-accent);
+	color: var(--afk-encre-accent, #0F4D73);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.afk-push-save:active { transform: scale(.98); }
+
+.afk-push-feedback { margin: .7rem 0 0; font-size: .9rem; }
+.afk-push-feedback[hidden] { display: none; }
+
+/* Note contextuelle (avertissement Play Protect de Samsung Internet).
+   Un encart d'information à part entière — icône, fond translucide,
+   filet — pour qu'on comprenne d'un coup d'œil que c'est une info,
+   pas la suite du message. */
+.afk-install-banner.has-note {
+	flex-wrap: wrap;
+}
+
+/* Base 0 : sans elle, le corps exige sa largeur naturelle et, dès que le
+   conteneur accepte le retour à la ligne, la rangée éclate en pile
+   verticale au lieu de rétrécir. */
+.afk-install-banner.has-note .afk-install-body {
+	flex: 1 1 0;
+}
+
+.afk-install-banner .afk-install-note {
+	/* Toute la largeur du bandeau, sous la rangée principale. */
+	flex: 1 1 100%;
+	order: 10;
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	margin-top: 2px;
+	padding: 8px 10px;
+	border-radius: 8px;
+	border-left: 3px solid rgba(255, 255, 255, .45);
+	background: rgba(255, 255, 255, .1);
+	font-size: 11px;
+	line-height: 1.5;
+	color: rgba(255, 255, 255, .92);
+	text-align: left;
+}
+
+.afk-install-banner .afk-install-note svg {
+	flex: 0 0 auto;
+	width: 14px;
+	height: 14px;
+	margin-top: 1px;
+	opacity: .85;
+}
+
+/* ------------------------------------------------------------------
+ * 5. Fenêtre d'invitation aux notifications
+ *
+ * La nôtre, jamais celle de OneSignal : elle s'habille comme le site
+ * et se traduit entièrement. Les centres d'intérêt y sont repliés —
+ * un visiteur qui accepte sans les déplier reçoit tout.
+ * ---------------------------------------------------------------- */
+
+.afk-push-modal {
+	--afk-accent: #D9BA61;
+	/* Voir la note sur `.afk-install-banner` : l'or ne se lit pas sous du
+	   blanc. L'encre suit le ton, pas l'inverse. */
+	--afk-encre-accent: var(--afk-theme, #0F4D73);
+	--afk-theme: #0F4D73;
+
+	position: fixed;
+	inset: 0;
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 18px;
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.afk-push-modal[hidden] { display: none; }
+
+.afk-push-modal-fond {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, .55);
+	-webkit-backdrop-filter: blur(2px);
+	backdrop-filter: blur(2px);
+}
+
+.afk-push-modal-boite {
+	position: relative;
+	width: 100%;
+	max-width: 380px;
+	background: var(--afk-theme);
+	color: #fff;
+	border-radius: 16px;
+	padding: 26px 22px 20px;
+	text-align: center;
+	box-shadow: 0 16px 48px rgba(0, 0, 0, .4);
+	animation: afk-push-entree .22s ease;
+}
+
+@keyframes afk-push-entree {
+	from { opacity: 0; transform: translateY(12px) scale(.97); }
+	to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.afk-push-modal-boite { animation: none; }
+}
+
+.afk-push-modal-fermer {
+	position: absolute;
+	top: 10px;
+	right: 12px;
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: #fff;
+	opacity: .55;
+	font-size: 22px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.afk-push-modal-fermer:hover { opacity: 1; }
+
+.afk-push-modal-icone {
+	width: 56px;
+	height: 56px;
+	border-radius: 14px;
+	background: #fff;
+	object-fit: contain;
+	margin-bottom: 12px;
+}
+
+.afk-push-modal-titre {
+	display: block;
+	font-size: 17px;
+	font-weight: 600;
+	margin-bottom: 6px;
+}
+
+.afk-push-modal-intro {
+	margin: 0 0 14px;
+	font-size: 13.5px;
+	line-height: 1.5;
+	opacity: .85;
+}
+
+/* ---- Section dépliable ---- */
+.afk-push-choix { margin-bottom: 16px; }
+
+.afk-push-deplier {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0 auto;
+	padding: 6px 4px;
+	border: 0;
+	background: transparent;
+	color: #fff;
+	font: inherit;
+	font-size: 12.5px;
+	opacity: .8;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.afk-push-deplier:hover { opacity: 1; }
+
+.afk-push-chevron {
+	width: 0;
+	height: 0;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-top: 5px solid currentColor;
+	transition: transform .18s ease;
+}
+
+.afk-push-deplier[aria-expanded="true"] .afk-push-chevron { transform: rotate(180deg); }
+
+.afk-push-modal .afk-push-liste {
+	display: flex;
+	flex-direction: column;
+	gap: 9px;
+	margin-top: 12px;
+	padding: 12px 14px;
+	border-radius: 10px;
+	background: rgba(255, 255, 255, .08);
+	text-align: left;
+}
+
+.afk-push-modal .afk-push-liste[hidden] { display: none; }
+
+.afk-push-modal .afk-push-item {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.afk-push-modal .afk-push-item input { accent-color: var(--afk-accent); }
+
+/* ---- Boutons ---- */
+.afk-push-modal-oui {
+	display: block;
+	width: 100%;
+	padding: 12px 18px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--afk-accent);
+	color: var(--afk-encre-accent, #0F4D73);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.afk-push-modal-oui:disabled { opacity: .6; cursor: default; }
+.afk-push-modal-oui:active { transform: scale(.98); }
+
+.afk-push-modal-non {
+	display: block;
+	width: 100%;
+	margin-top: 8px;
+	padding: 9px;
+	border: 0;
+	background: transparent;
+	color: #fff;
+	font: inherit;
+	font-size: 13px;
+	opacity: .6;
+	cursor: pointer;
+}
+
+.afk-push-modal-non:hover { opacity: .95; }
+
+.afk-push-modal-etat {
+	margin: 10px 0 0;
+	font-size: 12.5px;
+	opacity: .9;
+}
+
+.afk-push-modal-etat[hidden] { display: none; }
+
+/* Lien de confidentialité et désabonnement : discrets mais présents.
+   Le règlement demande que le visiteur sache à quoi il consent, et
+   puisse revenir dessus — pas qu'on le lui crie. */
+.afk-push-modal-politique {
+	display: block;
+	margin-top: 10px;
+	font-size: 11.5px;
+	color: rgba(255, 255, 255, .62);
+	text-decoration: underline;
+}
+
+.afk-push-modal-politique:hover { color: rgba(255, 255, 255, .95); }
+
+.afk-push-unsub {
+	margin-left: .6rem;
+	padding: .7rem 1.2rem;
+	border: 1px solid rgba(0, 0, 0, .2);
+	border-radius: 999px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+}
+
+.afk-push-unsub[hidden] { display: none; }
+.afk-push-unsub:hover { border-color: rgba(0, 0, 0, .45); }
+
+.afk-push-politique {
+	margin: .8rem 0 0;
+	font-size: .82rem;
+	opacity: .7;
+}
+
+/* ------------------------------------------------------------------
+ * 6. Cloche flottante — gestion de l'abonnement
+ *
+ * Discrète par construction : petite, semi-transparente au repos, et
+ * réservée aux abonnés. C'est le seul endroit d'où l'on peut retirer
+ * son consentement — le modèle du thème n'affichant pas toujours le
+ * contenu des pages, un code court ne suffisait pas.
+ * ---------------------------------------------------------------- */
+
+.afk-push-cloche {
+	--afk-theme: #0F4D73;
+
+	position: fixed;
+	left: 14px;
+	bottom: 14px;
+	z-index: 99998; /* sous le bandeau d'installation, au-dessus du site */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: var(--afk-theme);
+	color: #fff;
+	opacity: .55;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, .28);
+	cursor: pointer;
+	transition: opacity .18s ease, transform .18s ease;
+}
+
+.afk-push-cloche[hidden] { display: none; }
+
+/* ⚠️ `:focus-visible` a part, jamais groupe.
+
+   Un selecteur qu'un navigateur ne connait pas invalide la regle
+   ENTIERE, pas seulement sa ligne : sur Safari d'avant 15.4, la
+   moitie `:hover` tombait avec lui, et le champ actif perdait son
+   cadre en meme temps que son contour de mise au point. La regle
+   est donc coupee en deux partout ou les deux voisinaient. */
+.afk-push-cloche:hover {
+	opacity: 1;
+	transform: scale(1.06);
+}
+
+.afk-push-cloche:focus-visible {
+	opacity: 1;
+	transform: scale(1.06);
+}
+
+.afk-push-cloche svg { width: 18px; height: 18px; }
+
+/* La zone protégée de l'iPhone : la cloche ne doit pas se loger sous
+   la barre de navigation gestuelle. */
+@supports (padding: env(safe-area-inset-bottom)) {
+	.afk-push-cloche { bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.afk-push-cloche { transition: none; }
+}
+
+/* Bouton de désabonnement, dans la fenêtre en mode gestion. */
+.afk-push-modal-desabo {
+	display: block;
+	width: 100%;
+	margin-top: 8px;
+	padding: 9px;
+	border: 0;
+	background: transparent;
+	color: #fff;
+	font: inherit;
+	font-size: 12.5px;
+	opacity: .55;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.afk-push-modal-desabo[hidden] { display: none; }
+.afk-push-modal-desabo:hover { opacity: .95; }
+
+/* -------------------------------------------------------------------------
+ * 7. Bandeau de consentement
+ *
+ * Les deux boutons ont volontairement la meme taille, le meme
+ * remplissage et le meme contraste. Seule la couleur les distingue. Un
+ * refus plus discret que l'acceptation vicie le consentement : ce n'est
+ * pas une question de gout, c'est ce qui rend un bandeau opposable.
+ * ---------------------------------------------------------------------- */
+
+.afk-consent {
+	position: fixed;
+	left: 12px;
+	right: 12px;
+	bottom: 12px;
+	bottom: calc( 12px + env( safe-area-inset-bottom, 0px ) );
+	z-index: 99997;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px 18px;
+	max-width: 720px;
+	margin: 0 auto;
+	padding: 14px 16px;
+	border-radius: 12px;
+	background: var( --afk-theme, #0F4D73 );
+	color: #fff;
+	box-shadow: 0 8px 28px rgba( 0, 0, 0, .28 );
+	font-size: 14px;
+	line-height: 1.45;
+}
+
+.afk-consent[hidden] { display: none; }
+
+.afk-consent-texte { flex: 1 1 260px; min-width: 0; }
+
+.afk-consent-titre {
+	margin: 0 0 3px;
+	font-weight: 600;
+	font-size: 15px;
+}
+
+.afk-consent-message {
+	margin: 0;
+	opacity: .88;
+	font-size: 13px;
+}
+
+.afk-consent-message a { color: #fff; text-decoration: underline; }
+
+.afk-consent-boutons {
+	display: flex;
+	gap: 10px;
+	flex: 0 0 auto;
+}
+
+.afk-consent-btn {
+	flex: 1 1 0;
+	min-width: 116px;
+	padding: 10px 18px;
+	border-radius: 8px;
+	border: 1px solid rgba( 255, 255, 255, .45 );
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.afk-consent-non {
+	background: transparent;
+	color: #fff;
+}
+
+.afk-consent-oui {
+	background: var( --afk-accent, #D9BA61 );
+	border-color: var( --afk-accent, #D9BA61 );
+	color: var( --afk-encre-accent, #0F4D73 );
+}
+
+@media (max-width: 520px) {
+	.afk-consent-boutons { width: 100%; }
+}
+
+/* ---------- 5. Page d'installation partageable ----------
+ *
+ * ⚠️ Une PAGE, pas un bandeau agrandi.
+ *
+ * Le bandeau tient en une ligne parce qu'il se pose au bas d'un ecran
+ * occupe. Ici, le sujet occupe tout l'ecran : le geste se decompose en
+ * etapes numerotees, et le visuel anime tient la moitie de la largeur
+ * des qu'il y a la place. Reprendre la mise en page du bandeau aurait
+ * donne une infobulle perdue au milieu du vide.
+ */
+
+.afk-installer {
+	--afk-theme: #0F4D73;
+	--afk-accent: #D9BA61;
+	--afk-encre-accent: var(--afk-theme, #0F4D73);
+	--afk-papier: #fff;
+	--afk-encre: #0e2a38;
+	--afk-douce: #56707f;
+	--afk-trait: rgba(15, 77, 115, .16);
+
+	display: block;
+	padding: 0;
+	background: transparent;
+	color: var(--afk-encre);
+	font-size: 16px;
+	line-height: 1.55;
+}
+
+/* ⚠️ Un écart égal partout ne groupe rien.
+ *
+ * À 26 px uniformes, l'en-tête, le bouton, la marche à suivre et les
+ * atouts flottaient à distance identique : quatre blocs sans lien
+ * apparent, là où il n'y a qu'une invitation, un geste, et sa notice.
+ * Les écarts se resserrent DANS un groupe et s'ouvrent ENTRE les
+ * groupes. */
+.afk-installer-dedans {
+	display: grid;
+	gap: 0;
+	width: 100%;
+	max-width: 1040px;
+	margin: 0 auto;
+	padding: 34px 26px 38px;
+	border: 1px solid var(--afk-trait);
+	border-radius: 16px;
+	background: var(--afk-papier);
+}
+
+/* ---------- l'entete ---------- */
+
+.afk-installer-tete {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	margin-bottom: 22px;
+}
+
+.afk-installer-icone {
+	flex: 0 0 auto;
+	width: 72px;
+	height: 72px;
+	border-radius: 16px;
+}
+
+.afk-installer-titre {
+	margin: 0 0 6px;
+	font-size: clamp(24px, 4.4vw, 34px);
+	line-height: 1.12;
+	/* Le theme repeint les titres avec une regle prioritaire : sans
+	   `!important`, celui-ci ressortait en dore sur blanc — la couleur
+	   d'accent, illisible et hors charte pour un titre. La contrainte ne
+	   sort pas de cette section. */
+	color: var(--afk-theme) !important;
+}
+
+.afk-installer-message {
+	margin: 0;
+	max-width: 56ch;
+	font-size: 1.05em;
+	color: var(--afk-douce);
+}
+
+/* ---------- le geste principal ---------- */
+
+/* ---------- le badge d'installation ----------
+ *
+ * ⚠️ La forme d'un badge de magasin, jamais ses marques.
+ *
+ * Reprendre le badge de Google Play ou du Microsoft Store donnerait a
+ * croire que l'application s'y trouve — elle n'y est pas, et n'a pas a y
+ * etre : elle s'installe depuis le navigateur, sans compte de magasin ni
+ * validation. C'est la GRAMMAIRE du badge qu'on emprunte, parce qu'elle
+ * se reconnait au premier coup d'oeil : une icone, un verbe en petit, un
+ * nom en grand, un cadre sombre aux angles arrondis.
+ */
+
+.afk-install-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 14px;
+	width: auto;
+	/* Un enfant de grille s etire sur toute la colonne : le badge faisait
+	   un metre de large sur un ecran d ordinateur. Il se cale a gauche et
+	   garde la largeur de ses mots. */
+	justify-self: start;
+	min-height: 66px;
+	padding: 10px 26px 10px 16px;
+	border: 1px solid rgba(255, 255, 255, .28);
+	border-radius: 12px;
+	background: #0F4D73;
+	color: #fff;
+	text-align: left;
+	cursor: pointer;
+}
+
+.afk-install-badge:hover,
+.afk-install-badge:focus-visible { background: #0b3f60; }
+
+.afk-install-badge:focus-visible {
+	outline: 2px solid #D9BA61;
+	outline-offset: 3px;
+}
+
+.afk-install-badge-icone {
+	flex: 0 0 auto;
+	width: 38px;
+	height: 38px;
+	border-radius: 9px;
+	background: #fff;
+}
+
+.afk-install-badge-mots {
+	display: grid;
+	gap: 1px;
+	line-height: 1.15;
+}
+
+.afk-install-badge-sur {
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: .11em;
+	text-transform: uppercase;
+	opacity: .82;
+}
+
+.afk-install-badge-nom {
+	font-size: 21px;
+	font-weight: 700;
+	letter-spacing: -.01em;
+}
+
+/* Le geste principal, detache de ce qui l'explique. */
+.afk-installer .afk-install-badge { margin: 0 0 32px; }
+
+/* Le badge peut rester masque — iPhone, ordinateur sans installation
+   possible : la marche a suivre reprend alors l'ecart a son compte. */
+.afk-installer-marches { margin-top: 4px; }
+
+/* ---------- une marche a suivre ---------- */
+
+.afk-installer-marche {
+	display: grid;
+	gap: 22px;
+	align-items: start;
+	padding-top: 24px;
+	border-top: 1px solid var(--afk-trait);
+}
+
+/* Le visuel prend sa moitie des qu'il y a la place ; en dessous, il
+   passe sous le texte plutot que de le comprimer. */
+@media (min-width: 780px) {
+	.afk-installer-marche { grid-template-columns: 1fr minmax(240px, 340px); gap: 34px; }
+}
+
+.afk-installer-marche h3 {
+	margin: 0 0 12px;
+	font-size: 1.15em;
+	/* Meme raison que le titre ci-dessus. */
+	color: var(--afk-theme) !important;
+}
+
+/* ⚠️ Des numeros dessines, pas ceux du navigateur : ils portent la
+   couleur de la marque et gardent leur alignement quand une etape passe
+   sur deux lignes. */
+.afk-installer-etapes {
+	display: grid;
+	gap: 12px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: afk-etape;
+}
+
+.afk-installer-etapes li {
+	position: relative;
+	padding-left: 42px;
+	counter-increment: afk-etape;
+}
+
+.afk-installer-etapes li::before {
+	content: counter(afk-etape);
+	position: absolute;
+	left: 0;
+	top: -1px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: var(--afk-accent);
+	/* ⚠️ Une encre fixe, jamais celle du thème.
+	 *
+	 * `--afk-theme` s'éclaircit en thème sombre pour se détacher du fond
+	 * de la carte — mais le chiffre, lui, reste posé sur l'or. Bleu clair
+	 * sur or donne 1,4 pour 1 : les numéros d'étapes disparaissaient
+	 * purement et simplement de leur pastille. Constaté sur capture. */
+	color: #0F4D73;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.afk-installer-note {
+	/* Detachee de la derniere etape : alignee sous elle et sans
+	   separation, elle se lisait comme sa suite — « Touchez Ajouter…
+	   Safari uniquement… » formait une seule consigne, dont la seconde
+	   moitie n'en est pas une. */
+	margin: 18px 0 0;
+	padding: 10px 14px;
+	border-left: 3px solid var(--afk-accent);
+	border-radius: 0 6px 6px 0;
+	background: rgba(15, 77, 115, .04);
+	font-size: .92em;
+	color: var(--afk-douce);
+}
+
+@media (prefers-color-scheme: dark) {
+	.afk-installer-note { background: rgba(127, 182, 212, .08); }
+}
+
+.afk-installer-visuel {
+	margin: 0;
+	display: grid;
+	gap: 8px;
+	justify-items: center;
+}
+
+.afk-installer-visuel img,
+.afk-installer-visuel video {
+	display: block;
+	width: 100%;
+	max-width: 320px;
+	height: auto;
+	border: 1px solid var(--afk-trait);
+	border-radius: 14px;
+	background: rgba(15, 77, 115, .04);
+}
+
+.afk-installer-visuel figcaption {
+	font-size: .85em;
+	color: var(--afk-douce);
+}
+
+/* ---------- ce que l'application apporte ---------- */
+
+.afk-installer-atouts {
+	display: grid;
+	gap: 10px;
+	margin: 32px 0 0;
+	padding: 22px 0 0;
+	border-top: 1px solid var(--afk-trait);
+	list-style: none;
+	color: var(--afk-douce);
+}
+
+@media (min-width: 780px) {
+	.afk-installer-atouts { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+}
+
+.afk-installer-atouts li {
+	position: relative;
+	padding-left: 26px;
+	font-size: .95em;
+}
+
+.afk-installer-atouts li::before {
+	content: '';
+	position: absolute;
+	left: 2px;
+	top: .55em;
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--afk-accent);
+}
+
+/* ---------- qui parait, et quand ----------
+ *
+ * ⚠️ Tout est visible tant que le script n'a pas parle.
+ *
+ * Chaque marche porte son intitule — « Sur iPhone », « Sur Android » —
+ * et la page reste donc un mode d'emploi complet. Une page vide chez qui
+ * arrive avec un script bloque — ce qui est le cas d'une partie des
+ * navigateurs integres, justement le public de ce lien — vaudrait bien
+ * moins.
+ */
+
+.afk-installer-faite { display: none; }
+
+.afk-installer[data-afk-contexte] [data-afk-si] { display: none; }
+
+.afk-installer[data-afk-contexte="prompt"] [data-afk-si="prompt"],
+.afk-installer[data-afk-contexte="attente"] [data-afk-si="attente"],
+.afk-installer[data-afk-contexte="ios"] [data-afk-si="ios"],
+.afk-installer[data-afk-contexte="ios-autre"] [data-afk-si="ios-autre"],
+.afk-installer[data-afk-contexte="inapp"] [data-afk-si="inapp"],
+.afk-installer[data-afk-contexte="bureau"] [data-afk-si="bureau"] { display: grid; }
+
+.afk-installer[data-afk-contexte="installee"] [data-afk-si="installee"] { display: block; }
+
+.afk-installer[data-afk-contexte="installee"] .afk-installer-faite {
+	margin: 0;
+	padding: 16px 18px;
+	border-radius: 10px;
+	background: rgba(31, 122, 77, .10);
+	color: #1F7A4D;
+	font-weight: 600;
+}
+
+/* La premiere marche visible n'a personne au-dessus d'elle : son filet
+   ferait une ligne en l'air. */
+.afk-installer[data-afk-contexte] .afk-installer-marche { border-top: 0; padding-top: 0; }
+
+@media (prefers-color-scheme: dark) {
+	.afk-installer {
+		--afk-papier: #10262f;
+		--afk-encre: #e6eff3;
+		--afk-douce: #9DB8C6;
+		--afk-trait: rgba(127, 182, 212, .24);
+		--afk-theme: #8FC2DD;
+	}
+
+	/* ⚠️ Le badge s'inverse, comme celui d'un magasin.
+	 *
+	 * Bleu marine sur une carte bleu nuit, les deux surfaces se
+	 * confondaient : le geste principal de la page ne se distinguait plus
+	 * de son fond. Les badges de magasin font exactement cela — sombres
+	 * sur clair, clairs sur sombre. */
+	.afk-install-badge {
+		border-color: rgba(15, 77, 115, .18);
+		background: #EDF3F7;
+		color: #0B3A57;
+	}
+
+	.afk-install-badge:hover,
+	.afk-install-badge:focus-visible { background: #fff; }
+
+	.afk-install-badge-icone { border: 1px solid rgba(15, 77, 115, .16); }
+
+	/* Le bouton plein, lui, garde l'or et son encre marine : c'est le
+	   contraste verifie a 4,8 pour 1. Le badge n'en releve pas. */
+	.afk-installer .afk-install-cta:not(.afk-install-badge) { color: #08171e; }
+}

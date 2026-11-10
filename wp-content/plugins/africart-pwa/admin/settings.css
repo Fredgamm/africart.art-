@@ -1,0 +1,1040 @@
+/* AFRICART PWA — écrans de réglages de l'administration.
+ *
+ * Habillage léger posé PAR-DESSUS les styles natifs de WordPress, jamais
+ * à leur place : les champs, boutons et tableaux restent ceux de
+ * l'administration, pour que le plugin ne détonne pas et suive les
+ * évolutions de WordPress sans retouche.
+ *
+ * Chaque module ayant sa propre page depuis la refonte du menu, il n'y a
+ * plus d'onglets ici : seulement des cartes de section empilées.
+ *
+ * Sommaire :
+ *   1. En-tête de page (bandeau aux couleurs de la charte)
+ *   2. Cartes de section
+ *   3. Aperçus d'images
+ *   4. Blocs de traduction par langue
+ *   5. Barre d'enregistrement
+ *   6. Barre de progression des traitements par lots
+ */
+
+.afk-wrap { max-width: 1060px; }
+
+/* ---------- 1. En-tête de page ---------- */
+.afk-header {
+	display: flex; align-items: center; gap: 14px;
+	background: #171c3c;
+	border-radius: 8px; padding: 18px 22px; margin: 16px 0 0;
+}
+.afk-header img { width: 48px; height: 48px; border-radius: 10px; background: #fff; }
+.afk-header h1 { color: #fff; margin: 0; padding: 0; font-size: 1.5em; line-height: 1.2; }
+.afk-header p { color: #cfd3e6; margin: 2px 0 0; }
+.afk-header a { color: #ffde59; }
+
+
+/* ---------- 2. Cartes de section ---------- */
+.afk-card {
+	background: #fff; border: 1px solid #c3c4c7; border-radius: 6px;
+	padding: 4px 22px 16px; margin: 16px 0;
+	box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+.afk-card > h2 { font-size: 1.05em; padding: 12px 0 4px; margin: 0; }
+.afk-card > p.description { margin-top: 2px; }
+.afk-card .form-table th { width: 260px; }
+.afk-card .form-table { margin-top: 0; }
+
+/* ---------- 3. Aperçus d'images ---------- */
+.afk-media-preview {
+	display: inline-block; vertical-align: middle; margin-left: 10px;
+	padding: 4px; background: #f6f7f7; border: 1px solid #dcdcde; border-radius: 6px;
+}
+.afk-media-preview img { display: block; max-height: 48px; max-width: 120px; border-radius: 4px; }
+
+/* ---------- 4. Blocs de traduction par langue ---------- */
+.afk-lang-block {
+	border: 1px solid #dcdcde; border-radius: 6px;
+	margin: 12px 0; overflow: hidden;
+}
+.afk-lang-block > summary {
+	cursor: pointer; padding: 10px 16px; font-weight: 600;
+	background: #f6f7f7; list-style: revert;
+}
+.afk-lang-block[open] > summary { border-bottom: 1px solid #dcdcde; }
+.afk-lang-block .form-table { margin: 0; padding: 0 16px; }
+.afk-lang-default {
+	background: #f0f6fc; border: 1px solid #c5d9ed; border-radius: 6px;
+	padding: 10px 16px; margin: 12px 0;
+}
+
+/* ---------- 5. Barre d'enregistrement ----------
+   Collée en bas de fenêtre : les pages sont longues et le bouton doit
+   rester atteignable sans remonter. */
+.afk-savebar {
+	position: sticky; bottom: 0; z-index: 10;
+	background: #fff; border-top: 1px solid #c3c4c7;
+	padding: 10px 22px; margin: 20px -22px -16px;
+	display: flex; align-items: center; gap: 14px;
+}
+.afk-savebar .description { margin: 0; }
+
+/* Petites aides */
+.afk-hint { color: #646970; font-size: 12px; }
+
+/* ---------- 6. Progression des traitements par lots ----------
+   La largeur du remplissage est pilotée par le JavaScript à chaque
+   lot traité ; la transition adoucit la progression. */
+.afk-batch { margin: 6px 0 4px; }
+
+.afk-batch-bar {
+	height: 22px;
+	background: #f0f0f1;
+	border: 1px solid #dcdcde;
+	border-radius: 11px;
+	overflow: hidden;
+}
+
+.afk-batch-fill {
+	display: block;
+	height: 100%;
+	width: 0;
+	background: linear-gradient(90deg, #d96725, #e08a4d);
+	transition: width .3s ease;
+}
+
+.afk-batch-count {
+	margin: 10px 0 2px;
+	font-size: 14px;
+}
+.afk-batch-count strong { font-size: 18px; }
+.afk-batch-sep { color: #8c8f94; margin: 0 2px; }
+.afk-batch-state { color: #646970; }
+
+.afk-batch-summary { margin: 0 0 12px; }
+
+.afk-batch-actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin: 0 0 8px;
+}
+
+.afk-batch-note { margin: 0; max-width: 60ch; }
+
+.afk-batch-error {
+	margin: 10px 0 0;
+	padding: 8px 12px;
+	background: #fcf0ef;
+	border-left: 3px solid #b8392f;
+	color: #8a2b23;
+	font-size: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.afk-batch-fill { transition: none; }
+}
+
+/* ------------------------------------------------------------------
+ * Champs répétables (déclencheurs de notification)
+ * ---------------------------------------------------------------- */
+
+.afk-repeater {
+	margin-bottom: 12px;
+}
+
+.afk-repeater td,
+.afk-repeater th {
+	vertical-align: middle;
+}
+
+.afk-repeater select {
+	width: 100%;
+	max-width: 240px;
+}
+
+/* Colonne du bouton de retrait : juste assez large pour l'icône. */
+.afk-repeater-action {
+	width: 40px;
+	text-align: center;
+}
+
+.afk-repeater-remove {
+	color: #b32d2e;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.afk-repeater-remove:hover,
+.afk-repeater-remove:focus {
+	color: #8a2424;
+}
+
+.afk-repeater-empty td {
+	color: #666;
+	font-style: italic;
+}
+
+/* Retour aux valeurs d'usine — volontairement discret et à l'écart du
+   bouton d'enregistrement, l'action étant destructrice. */
+.afk-savebar .afk-reset {
+	color: #b32d2e;
+	margin-left: auto;
+	text-decoration: none;
+	font-size: 13px;
+}
+
+.afk-savebar .afk-reset:hover,
+.afk-savebar .afk-reset:focus {
+	color: #8a2424;
+	text-decoration: underline;
+}
+
+/* ------------------------------------------------------------------
+ * Infobulles
+ *
+ * Les écrans portaient de longs paragraphes explicatifs qui noyaient
+ * les champs. Le détail passe ici : visible au survol et au clavier,
+ * absent le reste du temps.
+ * ---------------------------------------------------------------- */
+
+.afk-info {
+	display: inline-block;
+	position: relative;
+	margin-left: 4px;
+	color: #2271b1;
+	cursor: help;
+	vertical-align: middle;
+}
+
+.afk-info .dashicons {
+	font-size: 17px;
+	width: 17px;
+	height: 17px;
+}
+
+.afk-info > span[role="tooltip"] {
+	position: absolute;
+	left: 50%;
+	bottom: calc(100% + 8px);
+	transform: translateX(-50%);
+	width: 300px;
+	background: #1d2327;
+	color: #f0f0f1;
+	border-radius: 5px;
+	padding: 9px 11px;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.5;
+	text-align: left;
+	white-space: normal;
+	box-shadow: 0 3px 10px rgba(0, 0, 0, .25);
+	/* Retiré du flux ET du calcul de largeur tant qu'il est masqué,
+	   sinon la colonne du tableau s'élargirait pour rien. */
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity .12s ease;
+	z-index: 20;
+}
+
+/* La flèche, qui rattache l'infobulle à son icône. */
+.afk-info > span[role="tooltip"]::after {
+	content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	margin-left: -5px;
+	border: 5px solid transparent;
+	border-top-color: #1d2327;
+}
+
+.afk-info:hover > span[role="tooltip"],
+.afk-info:focus > span[role="tooltip"],
+.afk-info:focus-within > span[role="tooltip"] {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* Près du bord gauche, l'infobulle centrée sortirait de l'écran. */
+.afk-info.afk-info-left > span[role="tooltip"] {
+	left: 0;
+	transform: none;
+}
+.afk-info.afk-info-left > span[role="tooltip"]::after {
+	left: 12px;
+}
+
+/* ------------------------------------------------------------------
+ * Champs de couleur
+ *
+ * Le champ portait bien une classe dédiée, mais aucun sélecteur ne s'y
+ * greffait : il ne restait qu'une saisie hexadécimale, sans aperçu.
+ * On associe donc un carré cliquable — qui ouvre le sélecteur du
+ * système — au champ texte, pour la saisie exacte d'un code de charte.
+ * ---------------------------------------------------------------- */
+
+.afk-color-field {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* Le carré. On neutralise l'habillage natif du contrôle, qui varie
+   fortement d'un navigateur à l'autre, pour n'en garder que la pastille. */
+.afk-color-swatch {
+	width: 38px;
+	height: 38px;
+	padding: 0;
+	border: 1px solid #8c8f94;
+	border-radius: 5px;
+	background: none;
+	cursor: pointer;
+	flex: 0 0 auto;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.afk-color-swatch::-webkit-color-swatch-wrapper { padding: 3px; }
+.afk-color-swatch::-webkit-color-swatch { border: none; border-radius: 3px; }
+.afk-color-swatch::-moz-color-swatch { border: none; border-radius: 3px; }
+
+.afk-color-swatch:hover { border-color: #2271b1; }
+
+.afk-color-swatch:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: 1px;
+}
+
+/* Le champ texte : largeur d'un code hexadécimal, pas davantage. */
+input[type="text"].afk-color {
+	width: 100px;
+	text-transform: lowercase;
+}
+
+.afk-color-reset {
+	color: #646970;
+	font-size: 12px;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.afk-color-reset:hover,
+.afk-color-reset:focus {
+	color: #2271b1;
+}
+
+/* Un code invalide se signale pendant la saisie, sans bloquer. */
+input[type="text"].afk-color.afk-color-invalide {
+	border-color: #b32d2e;
+	box-shadow: 0 0 0 1px #b32d2e;
+}
+
+/* ------------------------------------------------------------------
+ * Aperçus
+ *
+ * Une couleur ou un texte de bandeau ne se juge pas sur un formulaire.
+ * Ces blocs reproduisent le rendu et suivent la saisie en direct.
+ *
+ * Reproductions et non captures : afficher le vrai rendu demanderait
+ * une requête à chaque frappe. Les proportions sont donc indicatives.
+ * ---------------------------------------------------------------- */
+
+.afk-preview {
+	display: flex;
+	align-items: flex-start;
+	gap: 26px;
+	flex-wrap: wrap;
+	padding: 6px 0 10px;
+}
+
+/* ---- Le téléphone ---- */
+.afk-phone {
+	margin: 0;
+	flex: 0 0 auto;
+}
+
+.afk-phone-screen {
+	width: 232px;
+	height: 400px;
+	border: 8px solid #1d2327;
+	border-radius: 26px;
+	overflow: hidden;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	background: #171c3c;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, .18);
+	transition: background-color .15s ease;
+}
+
+.afk-phone-tall .afk-phone-screen { height: 430px; }
+
+.afk-phone figcaption {
+	text-align: center;
+	font-size: 12px;
+	color: #646970;
+	padding-top: 8px;
+}
+
+/* Barre du navigateur — masquée dans les modes sans interface. */
+.afk-phone-bar {
+	height: 26px;
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	padding: 0 9px;
+	background: #171c3c;
+	transition: background-color .15s ease;
+}
+
+.afk-phone-bar[hidden] { display: none; }
+
+.afk-phone-url {
+	font-size: 9px;
+	color: rgba(255, 255, 255, .72);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.afk-phone-body {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	padding: 12px;
+}
+
+.afk-phone-icon {
+	width: 66px;
+	height: 66px;
+	border-radius: 15px;
+	background: #fff;
+	object-fit: contain;
+}
+
+.afk-phone-name {
+	margin: 0;
+	color: #fff;
+	font-size: 15px;
+	font-weight: 600;
+	text-align: center;
+	word-break: break-word;
+}
+
+.afk-phone-button {
+	display: inline-block;
+	padding: 7px 18px;
+	border-radius: 999px;
+	background: #d96725;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 600;
+	transition: background-color .15s ease;
+}
+
+/* ---- Notes explicatives, une seule visible à la fois ---- */
+.afk-preview-notes {
+	margin: 4px 0 0;
+	flex: 1 1 180px;
+	min-width: 180px;
+	color: #646970;
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.afk-preview-notes li { margin: 0; }
+.afk-preview-notes li[hidden] { display: none; }
+
+/* ---- Page factice, pour situer le bandeau ---- */
+.afk-phone-page {
+	background: #f6f7f7;
+	justify-content: flex-start;
+	gap: 9px;
+	padding: 16px 12px;
+}
+
+.afk-phone-fake {
+	height: 9px;
+	border-radius: 4px;
+	background: #dcdcde;
+	flex: 0 0 auto;
+}
+
+.afk-phone-fake-court { width: 62%; }
+
+/* ---- Le bandeau ---- */
+/* Le vrai bandeau est peint de la couleur du thème (navy par défaut),
+   texte blanc : l'aperçu reproduit exactement cette palette — un aperçu
+   blanc sur un bandeau sombre mentait. */
+.afk-banner {
+	position: absolute;
+	left: 8px;
+	right: 8px;
+	background: #171c3c; /* suivi en direct via data-preview="theme_color" */
+	border-radius: 12px;
+	box-shadow: 0 3px 14px rgba(0, 0, 0, .35);
+	padding: 11px 12px 13px;
+	text-align: center;
+	transition: top .15s ease, bottom .15s ease, background-color .15s ease;
+}
+
+.afk-banner[data-position="top"]    { top: 10px; bottom: auto; }
+.afk-banner[data-position="bottom"] { bottom: 10px; top: auto; }
+
+.afk-banner-visuel {
+	display: block;
+	max-width: 100%;
+	margin: 0 auto 8px;
+	border-radius: 7px;
+}
+
+.afk-banner-visuel[hidden] { display: none; }
+
+.afk-banner-titre {
+	margin: 0;
+	font-size: 13px;
+	font-weight: 600;
+	color: #fff;
+}
+
+.afk-banner-message {
+	margin: 3px 0 9px;
+	font-size: 11px;
+	line-height: 1.45;
+	color: rgba(255, 255, 255, .82);
+}
+
+.afk-banner-bouton {
+	display: inline-block;
+	padding: 6px 20px;
+	border-radius: 999px;
+	background: #d96725;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 600;
+	transition: background-color .15s ease;
+}
+
+/* ------------------------------------------------------------------
+ * Mise en page à deux colonnes
+ *
+ * Les écrans qui offrent un aperçu le placent à droite des réglages,
+ * dans l'espace laissé libre par les tables de formulaire — étroites
+ * par nature. L'aperçu suit le défilement : il doit rester lisible
+ * pendant qu'on modifie un champ situé plus bas.
+ * ---------------------------------------------------------------- */
+
+.afk-layout {
+	display: flex;
+	align-items: flex-start;
+	gap: 24px;
+}
+
+/* min-width nulle : sans elle, une table large empêcherait la colonne
+   de rétrécir et pousserait l'aperçu hors de l'écran. */
+.afk-main {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.afk-side {
+	flex: 0 0 306px;
+	position: sticky;
+	top: 46px; /* Sous la barre d'administration. */
+}
+
+/* Les écrans avec aperçu ont besoin de plus de largeur que les autres. */
+.afk-wrap-large { max-width: 1400px; }
+
+.afk-side .afk-card { margin-top: 16px; }
+
+/* En colonne étroite, le téléphone et sa note s'empilent. */
+.afk-side .afk-preview {
+	flex-direction: column;
+	gap: 14px;
+}
+
+.afk-side .afk-phone { align-self: center; }
+
+.afk-side .afk-preview-notes {
+	flex: 1 1 auto;
+	min-width: 0;
+	font-size: 12px;
+}
+
+/* Sous cette largeur, deux colonnes deviennent illisibles : l'aperçu
+   repasse sous les réglages et cesse de suivre le défilement. */
+@media screen and (max-width: 1300px) {
+	.afk-layout { flex-direction: column; }
+
+	.afk-side {
+		position: static;
+		flex: 1 1 auto;
+		width: 100%;
+		max-width: 620px;
+	}
+
+	.afk-side .afk-preview { flex-direction: row; }
+	.afk-side .afk-phone { align-self: flex-start; }
+}
+
+/* ------------------------------------------------------------------
+ * Onglets d'aperçu (plateformes du bandeau, canaux de partage)
+ * ---------------------------------------------------------------- */
+
+.afk-mini-tabs {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+	margin: 10px 0 4px;
+}
+
+.afk-mini-tab {
+	border: 1px solid #c3c4c7;
+	background: #fff;
+	border-radius: 999px;
+	padding: 4px 12px;
+	font-size: 12px;
+	color: #2c3338;
+	cursor: pointer;
+}
+
+.afk-mini-tab:hover { border-color: #2271b1; color: #2271b1; }
+
+.afk-mini-tab.active {
+	background: #171c3c;
+	border-color: #171c3c;
+	color: #fff;
+}
+
+/* Le bouton du bandeau disparaît sur les plateformes sans fenêtre native. */
+.afk-banner-bouton[hidden] { display: none; }
+
+/* ------------------------------------------------------------------
+ * Aperçu des partages
+ *
+ * Une seule carte, rhabillée par canal via data-canal : chaque réseau
+ * compose différemment les mêmes quatre éléments (image, domaine,
+ * titre, description).
+ * ---------------------------------------------------------------- */
+
+#afk-share-article { width: 100%; max-width: 100%; }
+
+.afk-share-carte {
+	max-width: 272px;
+	margin-top: 10px;
+	border-radius: 8px;
+	overflow: hidden;
+	transition: opacity .15s ease;
+}
+
+.afk-share-image {
+	display: block;
+	width: 100%;
+	aspect-ratio: 1.91 / 1; /* Le format des cartes de partage (1200×630). */
+	object-fit: cover;
+	background: #dcdcde;
+}
+
+.afk-share-image[hidden] { display: none; }
+
+.afk-share-texte { padding: 8px 10px; }
+
+.afk-share-titre {
+	margin: 0;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.3;
+	color: #1d2327;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.afk-share-desc {
+	margin: 2px 0 0;
+	font-size: 11px;
+	line-height: 1.4;
+	color: #50575e;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.afk-share-domaine {
+	margin: 4px 0 0;
+	font-size: 10px;
+	color: #8c8f94;
+}
+
+/* Facebook : zone de texte grise, domaine en majuscules AU-DESSUS du titre. */
+.afk-share-carte[data-canal="facebook"] {
+	border: 1px solid #dcdcde;
+	border-radius: 0;
+}
+.afk-share-carte[data-canal="facebook"] .afk-share-texte {
+	background: #f0f2f5;
+	display: flex;
+	flex-direction: column;
+}
+.afk-share-carte[data-canal="facebook"] .afk-share-domaine {
+	order: -1;
+	text-transform: uppercase;
+	margin: 0 0 2px;
+}
+.afk-share-carte[data-canal="facebook"] .afk-share-desc { -webkit-line-clamp: 1; }
+
+/* WhatsApp : la carte vit dans une bulle de conversation. */
+.afk-share-carte[data-canal="whatsapp"] {
+	background: #d9fdd3;
+	padding: 5px;
+	border-radius: 10px;
+}
+.afk-share-carte[data-canal="whatsapp"] .afk-share-image { border-radius: 6px 6px 0 0; }
+.afk-share-carte[data-canal="whatsapp"] .afk-share-texte {
+	background: #d1f4cb;
+	border-radius: 0 0 6px 6px;
+}
+
+/* LinkedIn : titre et domaine seulement, pas de description. */
+.afk-share-carte[data-canal="linkedin"] {
+	border: 1px solid #dcdcde;
+	border-radius: 2px;
+}
+.afk-share-carte[data-canal="linkedin"] .afk-share-desc { display: none; }
+
+/* Instagram : bulle sombre de message privé — le fil n'accepte pas de lien. */
+.afk-share-carte[data-canal="instagram"] {
+	background: #262626;
+	border-radius: 16px;
+	max-width: 248px;
+}
+.afk-share-carte[data-canal="instagram"] .afk-share-titre { color: #fff; }
+.afk-share-carte[data-canal="instagram"] .afk-share-desc { color: #a8a8a8; -webkit-line-clamp: 1; }
+.afk-share-carte[data-canal="instagram"] .afk-share-domaine { color: #a8a8a8; }
+
+/* Note Play Protect dans l'aperçu (onglet Samsung) : le même encart
+   d'information que le vrai bandeau — icône, fond translucide, filet. */
+.afk-banner-note {
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
+	margin: 9px 0 0;
+	padding: 7px 8px;
+	border-radius: 7px;
+	border-left: 3px solid rgba(255, 255, 255, .45);
+	background: rgba(255, 255, 255, .1);
+	font-size: 10px;
+	line-height: 1.5;
+	color: rgba(255, 255, 255, .92);
+	text-align: left;
+}
+
+.afk-banner-note .dashicons {
+	flex: 0 0 auto;
+	font-size: 13px;
+	width: 13px;
+	height: 13px;
+	margin-top: 1px;
+	opacity: .85;
+}
+
+.afk-banner-note[hidden] { display: none; }
+
+/* ------------------------------------------------------------------
+ * Aperçu de la fenêtre d'invitation aux notifications
+ *
+ * Maquette à l'échelle du téléphone dessiné : mêmes proportions, mêmes
+ * couleurs que le rendu réel. Le dépliage y fonctionne pour qu'on voie
+ * ce que le visiteur découvrira.
+ * ---------------------------------------------------------------- */
+
+.afk-modal-mock {
+	position: absolute;
+	left: 14px;
+	right: 14px;
+	top: 50%;
+	transform: translateY(-50%);
+	padding: 16px 14px 13px;
+	border-radius: 12px;
+	background: #171c3c; /* suivi via data-preview="theme_color" */
+	color: #fff;
+	text-align: center;
+	box-shadow: 0 6px 22px rgba(0, 0, 0, .4);
+	transition: background-color .15s ease;
+}
+
+.afk-modal-mock-fermer {
+	position: absolute;
+	top: 5px;
+	right: 9px;
+	font-size: 15px;
+	opacity: .5;
+}
+
+.afk-modal-mock-icone {
+	width: 34px;
+	height: 34px;
+	border-radius: 9px;
+	background: #fff;
+	object-fit: contain;
+	margin-bottom: 7px;
+}
+
+.afk-modal-mock-titre {
+	margin: 0;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.afk-modal-mock-intro {
+	margin: 3px 0 9px;
+	font-size: 9.5px;
+	line-height: 1.45;
+	opacity: .82;
+}
+
+/* Le dépliage, cliquable ici comme chez le visiteur. */
+.afk-modal-mock-deplier {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin: 0 0 8px;
+	padding: 2px;
+	border: 0;
+	background: transparent;
+	color: #fff;
+	font: inherit;
+	font-size: 9px;
+	opacity: .78;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.afk-modal-mock-deplier:hover { opacity: 1; }
+
+.afk-modal-mock-chevron {
+	width: 0;
+	height: 0;
+	border-left: 3px solid transparent;
+	border-right: 3px solid transparent;
+	border-top: 4px solid currentColor;
+	transition: transform .18s ease;
+}
+
+.afk-modal-mock-deplier[aria-expanded="true"] .afk-modal-mock-chevron { transform: rotate(180deg); }
+
+.afk-modal-mock-liste {
+	margin: 0 0 9px;
+	padding: 8px 10px;
+	border-radius: 7px;
+	background: rgba(255, 255, 255, .09);
+	list-style: none;
+	text-align: left;
+}
+
+.afk-modal-mock-liste[hidden] { display: none; }
+
+.afk-modal-mock-liste li {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0 0 5px;
+	font-size: 9px;
+}
+
+.afk-modal-mock-liste li:last-child { margin-bottom: 0; }
+
+.afk-modal-mock-case {
+	width: 9px;
+	height: 9px;
+	border-radius: 2px;
+	background: #d96725; /* suivi via data-preview="accent_color" */
+	flex: 0 0 auto;
+	transition: background-color .15s ease;
+}
+
+.afk-modal-mock-oui {
+	display: block;
+	padding: 7px;
+	border-radius: 999px;
+	background: #d96725;
+	color: #fff;
+	font-size: 10px;
+	font-weight: 600;
+	transition: background-color .15s ease;
+}
+
+.afk-modal-mock-non {
+	display: block;
+	margin-top: 5px;
+	font-size: 9px;
+	opacity: .6;
+}
+
+.afk-modal-mock-politique {
+	display: block;
+	margin-top: 7px;
+	font-size: 8.5px;
+	opacity: .55;
+	text-decoration: underline;
+}
+
+/* Banc d'essai de la publication : l'état du type choisi doit se lire
+   d'un coup d'œil — c'est lui qui dit si publier servira à quelque chose. */
+.afk-test-etat {
+	display: flex;
+	align-items: flex-start;
+	gap: 7px;
+	margin: 10px 0 4px;
+	padding: 9px 11px;
+	border-radius: 7px;
+	border-left: 3px solid;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.afk-test-etat.afk-test-ok { border-color: #2f7d5d; background: rgba(47, 125, 93, .08); }
+.afk-test-etat.afk-test-ko { border-color: #996800; background: rgba(153, 104, 0, .09); }
+
+.afk-test-etat .dashicons { flex: 0 0 auto; margin-top: 1px; }
+.afk-test-etat.afk-test-ok .dashicons { color: #2f7d5d; }
+.afk-test-etat.afk-test-ko .dashicons { color: #996800; }
+
+p.afk-test-ok { color: #2f7d5d; }
+p.afk-test-ko { color: #b32d2e; }
+
+.afk-test-valeurs { font-style: italic; }
+
+/* Barre d'onglets de l'ecran Notifications. Marge basse seulement : le
+   reste vient de WordPress, pour que l'onglet soit exactement celui que
+   l'administrateur reconnait ailleurs. */
+.afk-onglets {
+	margin: 0 0 18px;
+}
+
+/* -------------------------------------------------------------------------
+ * 7. Ecran Abonnes
+ *
+ * Aucun style de tableau : celui de WordPress (wp-list-table widefat) fait
+ * deja le travail et reste coherent avec le reste de l'administration.
+ * Seuls les elements qui n'existent pas ailleurs sont definis ici.
+ * ---------------------------------------------------------------------- */
+
+.afk-stats {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 12px;
+	margin: 18px 0;
+}
+
+.afk-stat {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	padding: 14px 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.afk-stat-n {
+	font-size: 26px;
+	font-weight: 600;
+	line-height: 1.1;
+	color: #171c3c;
+}
+
+.afk-stat-note,
+.afk-muted {
+	color: #646970;
+	font-size: 12px;
+}
+
+.afk-portee {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.afk-portee em {
+	flex-basis: 100%;
+	color: #646970;
+	font-size: 12px;
+}
+
+.afk-pill {
+	display: inline-block;
+	padding: 2px 10px;
+	border-radius: 999px;
+	background: #eef0f6;
+	color: #171c3c;
+	font-size: 12px;
+	white-space: nowrap;
+}
+
+/* Un centre d'interet explicitement refuse : barre, pas efface. La
+   difference avec << jamais choisi >> doit rester lisible. */
+.afk-pill-off {
+	background: transparent;
+	border: 1px solid #dcdcde;
+	color: #a7aaad;
+	text-decoration: line-through;
+}
+
+.afk-ok { color: #007017; }
+.afk-ko { color: #b32d2e; }
+
+/* -------------------------------------------------------------------------
+ * 8. Apercu du bandeau de consentement
+ *
+ * La maquette respecte l'equilibre des deux boutons : c'est precisement
+ * ce que l'apercu sert a verifier.
+ * ---------------------------------------------------------------------- */
+
+.afk-consent-mock {
+	position: absolute;
+	left: 8px;
+	right: 8px;
+	bottom: 8px;
+	padding: 10px 11px;
+	border-radius: 9px;
+	background: #171c3c;
+	color: #fff;
+	text-align: left;
+}
+
+.afk-consent-mock-titre {
+	margin: 0 0 2px;
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.afk-consent-mock-texte {
+	margin: 0 0 9px;
+	font-size: 9.5px;
+	line-height: 1.35;
+	opacity: .85;
+}
+
+.afk-consent-mock-boutons { display: flex; gap: 6px; }
+
+.afk-consent-mock-btn {
+	flex: 1 1 0;
+	padding: 6px 4px;
+	border-radius: 6px;
+	font-size: 9.5px;
+	font-weight: 600;
+	text-align: center;
+	border: 1px solid rgba( 255, 255, 255, .45 );
+}
+
+.afk-consent-mock-ok {
+	background: #d96725;
+	border-color: #d96725;
+}
