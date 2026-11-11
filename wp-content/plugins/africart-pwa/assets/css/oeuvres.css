@@ -2693,7 +2693,7 @@ button.afk-oeuvre-sync:hover { text-decoration-thickness: 2px; }
 	/* Opaque, toujours. Un en-tete a travers lequel on voit la page se
 	   confond avec elle des qu'on defile. */
 	background: var( --afk-entete-fond );
-	border-bottom: 1px solid var( --afk-entete-trait );
+	/* Pas de trait sous le menu : retire a la demande du client (2026-11). */
 	color: var( --afk-entete-encre );
 	font-family: inherit;
 }
@@ -2825,16 +2825,18 @@ button.afk-oeuvre-sync:hover { text-decoration-thickness: 2px; }
 	outline-offset: -2px;
 }
 
-/* La page ou l'on se trouve, soulignee : la couleur seule ne se voit
-   pas sur un menu deja colore. */
-/* La page ou l'on se trouve : un fond, un soulignement ET une barre a
-   gauche. La couleur seule ne suffit pas a qui ne la distingue pas. */
+/* La page ou l'on se trouve : le fond grise seul, sans barre a gauche
+   ni soulignement (demande du client, 2026-11). Le lecteur d'ecran
+   l'annonce toujours grace a aria-current. */
 .afk-entree-lien[aria-current="page"] {
 	background: var( --afk-entete-survol );
-	box-shadow: inset 3px 0 0 var( --afk-entete-marque );
-	text-decoration: underline;
-	text-underline-offset: 4px;
 }
+
+/* ⚠️ « A propos d'Africart » ouvre un sous-menu : c'est un <button>, pas
+   un lien. La charte Elementor (.elementor-kit-8 a) allege les liens a
+   300 mais ne touche pas les boutons, qui restaient a 600 et sortaient
+   en gras. Meme graisse pour toutes les entrees du menu. */
+.afk-entete .afk-entree-ouvre { font-weight: 300; }
 
 .afk-entree-chevron {
 	width: 8px;
