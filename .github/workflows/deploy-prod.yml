@@ -58,11 +58,35 @@ jobs:
           [ "$d" = "$FTP_WP_CONTENT" ] || echo "::notice::Chemin FTP_WP_CONTENT nettoyé (espaces, retour à la ligne ou / ajouté)."
           echo "FTP_WP_CONTENT=$d" >> "$GITHUB_ENV"
 
+      # ⚠️ Le FTP d'o2switch n'envoie que son propre certificat, sans les intermédiaires
+      # Let's Encrypt (YR1 -> Root YR, croisé par ISRG Root X1). On les récupère via
+      # l'adresse indiquée dans le certificat (AIA), on VÉRIFIE que la chaîne remonte
+      # à une racine du système, et seulement alors on s'en sert. Pas de vérification
+      # désactivée : le mot de passe ne part que vers le vrai serveur.
+      - name: Compléter la chaîne TLS du serveur FTP
+        run: |
+          t="$RUNNER_TEMP/tls"; mkdir -p "$t"; cd "$t"
+          echo | timeout 30 openssl s_client -starttls ftp -connect "$FTP_HOST:21" -servername "$FTP_HOST" 2>/dev/null | openssl x509 > serveur.pem
+          : > intermediaires.pem; cert=serveur.pem
+          for i in 1 2 3; do
+            url=$(openssl x509 -in "$cert" -noout -text | grep -oE 'CA Issuers - URI:[^ ]+' | sed 's/CA Issuers - URI://' | head -1)
+            [ -n "$url" ] || break
+            curl -sf --max-time 30 "$url" -o c$i.der || break
+            openssl x509 -inform DER -in c$i.der -out c$i.pem 2>/dev/null || openssl x509 -in c$i.der -out c$i.pem
+            cat c$i.pem >> intermediaires.pem; cert=c$i.pem
+            openssl verify -CAfile /etc/ssl/certs/ca-certificates.crt -untrusted intermediaires.pem serveur.pem > /dev/null 2>&1 && break
+          done
+          openssl verify -CAfile /etc/ssl/certs/ca-certificates.crt -untrusted intermediaires.pem -verify_hostname "$FTP_HOST" serveur.pem \
+            || { echo "::error::Certificat du serveur FTP non vérifiable : déploiement arrêté, rien n'a été envoyé."; exit 1; }
+          cat /etc/ssl/certs/ca-certificates.crt intermediaires.pem > ca-complet.pem
+          echo "FTP_CA_FILE=$t/ca-complet.pem" >> "$GITHUB_ENV"
+          echo "NODE_EXTRA_CA_CERTS=$t/intermediaires.pem" >> "$GITHUB_ENV"
+
       - name: Télécharger la version du serveur (lecture seule)
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq lftp > /dev/null
           mkdir -p "$RUNNER_TEMP/serveur"
-          cmds="set ftp:ssl-force true; set ftp:ssl-protect-data true; set net:max-retries 2; set net:timeout 30; set cmd:fail-exit no;"
+          cmds="set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate true; set ssl:ca-file '$FTP_CA_FILE'; set net:max-retries 2; set net:timeout 30; set cmd:fail-exit no;"
           cmds="$cmds cd '$FTP_WP_CONTENT' || exit 1;"
           cmds="$cmds get -O '$RUNNER_TEMP/serveur' .ftp-deploy-sync-state.json;"
           for d in $(git ls-files wp-content | cut -d/ -f2-3 | sort -u); do
@@ -87,6 +111,7 @@ jobs:
           server: arancia.o2switch.net
           port: 21
           protocol: ftps
+          security: strict
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./wp-content/
