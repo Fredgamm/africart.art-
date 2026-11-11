@@ -46,9 +46,20 @@ jobs:
       - name: Vérifier la syntaxe PHP
         run: find wp-content -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
 
+      # Le secret est souvent collé avec un espace ou un retour à la ligne invisible,
+      # ou sans le / final : on le nettoie ici. Le garde-fou voxel-child plus bas
+      # vérifie ensuite qu'on est bien dans le wp-content d'africart.art.
+      - name: Normaliser le chemin du serveur
+        run: |
+          d=$(printf '%s' "$FTP_WP_CONTENT" | tr -d '\r\n\t' | sed -e 's/^ *//' -e 's/ *$//')
+          [ -n "$d" ] || { echo "::error::Secret FTP_WP_CONTENT vide."; exit 1; }
+          case "$d" in /*) ;; *) d="/$d";; esac
+          case "$d" in */) ;; *) d="$d/";; esac
+          [ "$d" = "$FTP_WP_CONTENT" ] || echo "::notice::Chemin FTP_WP_CONTENT nettoyé (espaces, retour à la ligne ou / ajouté)."
+          echo "FTP_WP_CONTENT=$d" >> "$GITHUB_ENV"
+
       - name: Télécharger la version du serveur (lecture seule)
         run: |
-          case "$FTP_WP_CONTENT" in */) ;; *) echo "::error::FTP_WP_CONTENT doit finir par /"; exit 1;; esac
           sudo apt-get update -qq && sudo apt-get install -y -qq lftp > /dev/null
           mkdir -p "$RUNNER_TEMP/serveur"
           cmds="set ftp:ssl-force true; set ftp:ssl-protect-data true; set net:max-retries 2; set net:timeout 30; set cmd:fail-exit no;"
@@ -79,7 +90,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./wp-content/
-          server-dir: ${{ secrets.FTP_WP_CONTENT }}
+          server-dir: ${{ env.FTP_WP_CONTENT }}
           state-name: .ftp-deploy-sync-state.json
           exclude: |
             **/.git*
